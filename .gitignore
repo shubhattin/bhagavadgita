@@ -1,0 +1,54 @@
+node_modules
+
+# Output
+.output
+.netlify
+.vercel
+/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+
+*~$*.xlsx
+kAraH/dattAMsh/ascii
+src/tests/data/nAradavAkyam_out.xlsx
+__pycache__
+a.ts
+a.py
+.~lock.*
+a.xlsx
+a.json
+a.txt
+a.yaml
+a/
+
+src/db/scripts/backup/
+
+# data/gita/raw_data
+data/gita/out
+data/gita/zipped
+data/gita/test_output.md
+data/gita/tmp
+
+static/~partytown
+src/components/pages/main_page/local_config.yaml
+static/robots.txt
+static/sitemap.xml
+
+
+
+src/db/scripts/out/
+.trigger
