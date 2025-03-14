@@ -1,11 +1,6 @@
 <script lang="ts">
-  import { rAmAyaNam_map, sarga_data, trans_en_data } from '~/state/main_page/data';
-  import {
-    BASE_SCRIPT,
-    kANDa_selected,
-    chapter_selected,
-    TEXT_MODEL_LIST
-  } from '~/state/main_page/main_state';
+  import { gita_map, sarga_data, trans_en_data } from '~/state/main_page/data';
+  import { BASE_SCRIPT, chapter_selected, TEXT_MODEL_LIST } from '~/state/main_page/main_state';
   import Icon from '~/tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
   import { writable } from 'svelte/store';
@@ -38,9 +33,8 @@
     }[];
     additional_prompt_info: string;
   };
-  let kANDa_info = $derived(rAmAyaNam_map[$kANDa_selected - 1]);
-  let sarga_info = $derived(kANDa_info.sarga_data[$chapter_selected - 1]);
-  let shloka_count = $derived(sarga_info.shloka_count_extracted);
+  let sarga_info = $derived(gita_map[$chapter_selected - 1]);
+  let shloka_count = $derived(sarga_info.total);
 
   let selected_text_model: keyof typeof TEXT_MODEL_LIST = $state('gpt-4o');
 
@@ -99,10 +93,8 @@
 
   let additional_prompt_info = $derived(
     format_string_text(base_prompts.additional_prompt_info, {
-      sarga_index: sarga_info.index,
-      sarga_name_normal: sarga_info.name_normal,
-      kANDa_index: kANDa_info.index,
-      kANDa_name_normal: kANDa_info.name_normal
+      chapter_index: sarga_info.index,
+      chapter_name_normal: sarga_info.name_normal
     })
   );
 
@@ -113,7 +105,7 @@
       $sarga_data.isSuccess &&
       (async () => {
         const shloka_text = $sarga_data.data![$shloka_numb];
-        const shloka_text_normal = await lipi_parivartak(shloka_text, BASE_SCRIPT, 'Normal');
+        const shloka_text_normal = await lipi_parivartak(shloka_text.text, BASE_SCRIPT, 'Normal');
         let prompt = shloka_text + '\n' + shloka_text_normal;
         const trans_en_all = $trans_en_data.data!;
         if (trans_en_all.has($shloka_numb)) prompt += '\n\n' + trans_en_all.get($shloka_numb);
@@ -123,7 +115,6 @@
 
   $effect(() => {
     // reset image prompt text on change of kanda, sarga or shloka
-    $kANDa_selected;
     $chapter_selected;
     $shloka_numb;
     $image_prompt = '';
@@ -148,7 +139,7 @@
 
   const image_prompt_q = $derived(
     createQuery({
-      queryKey: ['shloka_text_prompt', $chapter_selected, $kANDa_selected, $shloka_numb],
+      queryKey: ['shloka_text_prompt', $chapter_selected, $shloka_numb],
       queryFn: async () => {
         show_prompt_time_status = false;
         auto_image_generated = false;
@@ -197,7 +188,7 @@
 
   const image_q = $derived(
     createQuery({
-      queryKey: ['shloka_image', $kANDa_selected, $chapter_selected, $shloka_numb],
+      queryKey: ['shloka_image', $chapter_selected, $shloka_numb],
       queryFn: async () => {
         show_image_time_status = false;
         if (import.meta.env.DEV && load_ai_sample_data) {
@@ -253,7 +244,7 @@
 
   const download_image = (image: image_data_type) => {
     if (!image) return;
-    const file_name = `Image ${$chapter_selected}-${$kANDa_selected} Shloka No. ${$shloka_numb}`;
+    const file_name = `Image ${$chapter_selected} Shloka No. ${$shloka_numb}`;
     if (load_ai_sample_data) download_file_in_browser(image.url, `${file_name}.webp`);
     else if (image.out_format == 'url')
       download_external_file_in_browser(image.url, `${file_name}.png`);

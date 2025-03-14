@@ -327,15 +327,15 @@ export const render_all_texts = async (
 
   const shloka_lines = (() => {
     if ($image_shloka === 0) {
-      const words = shloka_data.split(' ');
+      const words = shloka_data.text.split(' ');
       const break_point = 3;
       return [words.slice(0, break_point).join(' '), words.slice(break_point).join(' ')];
     } else if ($image_shloka === -1) {
-      const words = shloka_data.split(' ');
+      const words = shloka_data.text.split(' ');
       const break_point = 4;
       return [words.slice(0, break_point).join(' '), words.slice(break_point).join(' ')];
     }
-    const line_split = shloka_data.split('\n');
+    const line_split = shloka_data.text.split('\n');
     const new_shloka_lines: string[] = [];
     for (let i = 0; i < line_split.length; i++) {
       const line = line_split[i];

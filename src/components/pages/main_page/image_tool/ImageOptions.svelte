@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { rAmAyaNam_map } from '~/state/main_page/data';
+  import { gita_map } from '~/state/main_page/data';
   import {
     DEFAULT_MAIN_TEXT_FONT_CONFIGS,
     DEFAULT_TRANS_TEXT_FONT_CONFIGS,
-    image_kANDa,
     image_lang,
     image_rendering_state,
     image_chapter,
@@ -31,8 +30,7 @@
   } from './settings';
   import { copy_plain_object } from '~/tools/kry';
 
-  let kANDa_info = $derived(rAmAyaNam_map[$image_kANDa - 1]);
-  let shloka_count = $derived(kANDa_info.sarga_data[$image_chapter - 1].shloka_count_extracted);
+  let shloka_count = $derived(gita_map[$image_chapter - 1].total);
 
   let settings_tab: 'depend' | 'non-depend' = $state('non-depend');
 
