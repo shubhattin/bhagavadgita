@@ -5,8 +5,8 @@ export const translations = pgTable(
   {
     lang_id: integer().notNull(),
     chapter_num: smallint().notNull(),
-    shloka_num: smallint().notNull(),
+    index: smallint().notNull(),
     text: text().default('').notNull()
   },
-  (table) => [primaryKey({ columns: [table.lang_id, table.chapter_num, table.shloka_num] })]
+  (table) => [primaryKey({ columns: [table.lang_id, table.chapter_num, table.index] })]
 );

@@ -33,8 +33,8 @@
     }[];
     additional_prompt_info: string;
   };
-  let sarga_info = $derived(gita_map[$chapter_selected - 1]);
-  let shloka_count = $derived(sarga_info.total);
+  let chapter_info = $derived(gita_map[$chapter_selected - 1]);
+  let shloka_total = $derived(chapter_info.total);
 
   let selected_text_model: keyof typeof TEXT_MODEL_LIST = $state('gpt-4o');
 
@@ -47,10 +47,10 @@
 
   $effect(() => {
     if ($chapter_selected) {
-      $shloka_numb = 1;
+      $shloka_index = 1;
     }
   });
-  let shloka_numb = writable(1);
+  let shloka_index = writable(1);
   let base_user_prompt = writable<string>(base_prompts.main_prompt[0].content);
   let auto_gen_image = writable(false);
   let shloka_text_prompt = writable('');
@@ -93,8 +93,8 @@
 
   let additional_prompt_info = $derived(
     format_string_text(base_prompts.additional_prompt_info, {
-      chapter_index: sarga_info.index,
-      chapter_name_normal: sarga_info.name_normal
+      chapter_index: chapter_info.index,
+      chapter_name_normal: chapter_info.name_normal
     })
   );
 
@@ -104,11 +104,11 @@
       !$sarga_data.isFetching &&
       $sarga_data.isSuccess &&
       (async () => {
-        const shloka_text = $sarga_data.data![$shloka_numb];
-        const shloka_text_normal = await lipi_parivartak(shloka_text.text, BASE_SCRIPT, 'Normal');
+        const shloka_text = $sarga_data.data![$shloka_index].text;
+        const shloka_text_normal = await lipi_parivartak(shloka_text, BASE_SCRIPT, 'Normal');
         let prompt = shloka_text + '\n' + shloka_text_normal;
         const trans_en_all = $trans_en_data.data!;
-        if (trans_en_all.has($shloka_numb)) prompt += '\n\n' + trans_en_all.get($shloka_numb);
+        if (trans_en_all.has($shloka_index)) prompt += '\n\n' + trans_en_all.get($shloka_index);
         $shloka_text_prompt = prompt;
       })();
   });
@@ -116,7 +116,7 @@
   $effect(() => {
     // reset image prompt text on change of kanda, sarga or shloka
     $chapter_selected;
-    $shloka_numb;
+    $shloka_index;
     $image_prompt = '';
   });
 
@@ -139,7 +139,7 @@
 
   const image_prompt_q = $derived(
     createQuery({
-      queryKey: ['shloka_text_prompt', $chapter_selected, $shloka_numb],
+      queryKey: ['shloka_text_prompt', $chapter_selected, $shloka_index],
       queryFn: async () => {
         show_prompt_time_status = false;
         auto_image_generated = false;
@@ -188,7 +188,7 @@
 
   const image_q = $derived(
     createQuery({
-      queryKey: ['shloka_image', $chapter_selected, $shloka_numb],
+      queryKey: ['shloka_image', $chapter_selected, $shloka_index],
       queryFn: async () => {
         show_image_time_status = false;
         if (import.meta.env.DEV && load_ai_sample_data) {
@@ -244,7 +244,7 @@
 
   const download_image = (image: image_data_type) => {
     if (!image) return;
-    const file_name = `Image ${$chapter_selected} Shloka No. ${$shloka_numb}`;
+    const file_name = `Image ${$chapter_selected} Shloka No. ${$shloka_index}`;
     if (load_ai_sample_data) download_file_in_browser(image.url, `${file_name}.webp`);
     else if (image.out_format == 'url')
       download_external_file_in_browser(image.url, `${file_name}.png`);
@@ -275,28 +275,29 @@
     <span class="font-semibold">Shloka No.</span>
     <button
       class="btn-hover"
-      disabled={$shloka_numb === 0}
+      disabled={$shloka_index === 0}
       onclick={() => {
-        if ($shloka_numb !== -1) $shloka_numb -= 1;
-        else $shloka_numb = shloka_count;
+        if ($shloka_index !== -1) $shloka_index -= 1;
+        else $shloka_index = shloka_total;
       }}
     >
       <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
     </button>
-    <select class="select inline-block w-14 px-1 text-sm ring-2" bind:value={$shloka_numb}>
-      <option value={0}>0</option>
-      {#each Array(shloka_count) as _, index}
-        <option value={index + 1}>{index + 1}</option>
+    <select class="select inline-block w-19 px-1 text-sm ring-2" bind:value={$shloka_index}>
+      {#each Array(shloka_total) as _, index}
+        <option value={index}
+          >{index}{$sarga_data.data![index].shloka_num &&
+            ` - ${$sarga_data.data![index].shloka_num}`}</option
+        >
       {/each}
-      <option value={-1}>-1</option>
     </select>
     <button
       class="btn-hover"
       onclick={() => {
-        if ($shloka_numb !== shloka_count) $shloka_numb += 1;
-        else $shloka_numb = -1;
+        if ($shloka_index !== shloka_total) $shloka_index += 1;
+        else $shloka_index = -1;
       }}
-      disabled={$shloka_numb === -1}
+      disabled={$shloka_index === -1}
     >
       <Icon src={TiArrowForwardOutline} class="-mt-1 text-lg" />
     </button>
@@ -365,7 +366,7 @@
   >
     {#each $shloka_text_prompt.split('\n') as line}
       <div>
-        {line === '' ? '\u200d' : line}
+        {line}
       </div>
     {/each}
   </div>
