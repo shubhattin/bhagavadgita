@@ -5,7 +5,7 @@ import { get_derived_query } from '~/tools/query';
 import { queryClient } from '~/state/query';
 import { derived, writable } from 'svelte/store';
 import { client } from '~/api/client';
-import rAmAyaNam_map from '@data/ramayan/ramayan_map.json';
+import rAmAyaNam_map from '@data/gita/ramayan_map.json';
 import { lipi_parivartak } from '~/tools/converter';
 
 import {

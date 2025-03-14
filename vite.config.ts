@@ -11,7 +11,7 @@ export default defineConfig({
   // },
   server: {
     fs: {
-      allow: ['./data/ramayan', './static/img']
+      allow: ['./data/gita', './static/img']
     }
   },
   worker: {

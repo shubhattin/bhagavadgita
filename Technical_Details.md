@@ -27,7 +27,7 @@
   - `get_text.py`: Processes the raw data and stores the text in `data/ramaayana/text_data/`.
   - `get_json.py`: Processes the text data and stores the JSON in `data/ramaayana/data/`.
   - `make_excel_files.ts`: Processes the JSON data and stores the Excel files in `data/ramaayana/out/`.
-  - `run_tests.py`: Runs the tests on the JSON data, and saves the generated test result in `data/ramayan/test_out.md`.
+  - `run_tests.py`: Runs the tests on the JSON data, and saves the generated test result in `data/gita/test_out.md`.
 - [Raw Data Cached Zip of Extarcted HTML](https://github.com/shubhattin/valmiki_ramayanam/releases/download/raw_data/raw_data.7z) on [raw data release](https://github.com/shubhattin/valmiki_ramayanam/releases/tag/raw_data)
 
 ### Shloka Image Generation

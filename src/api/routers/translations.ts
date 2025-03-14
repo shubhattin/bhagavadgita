@@ -151,8 +151,8 @@ const trigger_translations_update_route = protectedAdminProcedure.mutation(async
 
 export async function get_sarga_data(kANDa_num: number, sarga_num: number) {
   // ^ This is to prevent this to be bundled in edge functions as it a limit of 1mb(gzip)
-  const glob_path = `/data/ramayan/data/*/*.json` as const;
-  const all_sargas = import.meta.glob('/data/ramayan/data/*/*.json');
+  const glob_path = `/data/gita/data/*/*.json` as const;
+  const all_sargas = import.meta.glob('/data/gita/data/*/*.json');
   const data = ((await all_sargas[glob_path.replace('*/*', `${kANDa_num}/${sarga_num}`)]()) as any)
     .default as string[];
   await delay(350);

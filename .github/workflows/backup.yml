@@ -40,21 +40,21 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-        # set working directory to data/ramayan
+        # set working directory to data/gita
         # Install dependencies
       - name: Install dependencies
-        working-directory: data/ramayan
+        working-directory: data/gita
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
       - name: Generate Excel Files
-        working-directory: data/ramayan
+        working-directory: data/gita
         run: |
           python3 get_json.py --no-run-test
       - run: |
-          npx vite-node data/ramayan/make_excel_files.ts --no-zip
+          npx vite-node data/gita/make_excel_files.ts --no-zip
       - uses: actions/upload-artifact@v4
         with:
           name: excel_files
-          path: data/ramayan/out/
+          path: data/gita/out/
           retention-days: 60

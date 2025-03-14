@@ -42,7 +42,7 @@
       if (!browser) return;
       // the method used below creates a url for both dev and prod
       const ExcelJS = (await import('exceljs')).default;
-      const url = new URL('/data/ramayan/template/excel_file_template.xlsx', import.meta.url).href;
+      const url = new URL('/data/gita/template/excel_file_template.xlsx', import.meta.url).href;
       const req = await fetch(url);
       const file_blob = await req.blob();
       const workbook = new ExcelJS.Workbook();
