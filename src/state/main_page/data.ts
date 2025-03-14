@@ -44,9 +44,10 @@ export const sarga_data = get_derived_query([chapter_selected], ([$chapter_selec
       placeholderData: [],
       queryFn: async () => {
         if (!browser) return [];
-        return await client.translations.get_sarga_data.query({
+        const data = await client.translations.get_sarga_data.query({
           chapter_num: $chapter_selected
         });
+        return data;
       }
     },
     queryClient

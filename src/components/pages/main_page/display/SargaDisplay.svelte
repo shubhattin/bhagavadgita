@@ -8,7 +8,6 @@
     viewing_script,
     trans_lang,
     typing_assistance_modal_opened,
-    kANDa_selected,
     chapter_selected,
     view_translation_status,
     added_translations_indexes,
@@ -45,10 +44,12 @@
   let transliterated_sarga_data = $state<string[]>([]);
   $effect(() => {
     // console.time('transliterate_sarga_data');
-    lipi_parivartak($sarga_data.data ?? [], BASE_SCRIPT, $viewing_script).then((data) => {
-      // console.timeEnd('transliterate_sarga_data');
-      transliterated_sarga_data = data;
-    });
+    lipi_parivartak($sarga_data.data?.map((v) => v.text) ?? [], BASE_SCRIPT, $viewing_script).then(
+      (data) => {
+        // console.timeEnd('transliterate_sarga_data');
+        transliterated_sarga_data = data;
+      }
+    );
   });
 
   async function update_trans_lang_data(index: number, text: string) {
@@ -59,10 +60,7 @@
     } else {
       const new_data = new Map($trans_en_data.data);
       new_data.set(index, text);
-      await query_client.setQueryData(
-        QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $chapter_selected),
-        new_data
-      );
+      await query_client.setQueryData(QUERY_KEYS.trans_lang_data(1, $chapter_selected), new_data);
     }
   }
   // clipboard related
@@ -86,7 +84,11 @@
   const copy_sarga_with_transliteration_and_translation = async () => {
     const texts_to_copy = await Promise.all(
       transliterated_sarga_data.map(async (shloka_lines, i) => {
-        const normal_shloka = await lipi_parivartak($sarga_data.data![i], BASE_SCRIPT, 'Normal');
+        const normal_shloka = await lipi_parivartak(
+          $sarga_data.data![i].text,
+          BASE_SCRIPT,
+          'Normal'
+        );
         const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i;
         let txt = `${shloka_lines}\n${normal_shloka}`;
         const lang_data = $trans_lang === 0 ? $trans_en_data.data : $trans_lang_data.data;

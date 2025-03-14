@@ -2,7 +2,6 @@
   import { client } from '~/api/client';
   import {
     editing_status_on,
-    kANDa_selected,
     chapter_selected,
     trans_lang,
     added_translations_indexes,
@@ -10,7 +9,7 @@
   } from '~/state/main_page/main_state';
   import {
     QUERY_KEYS,
-    rAmAyaNam_map,
+    gita_map,
     sarga_data,
     trans_en_data,
     trans_lang_data,
@@ -30,9 +29,8 @@
 
   const query_client = useQueryClient();
 
-  let kANDa_info = $derived(rAmAyaNam_map[$kANDa_selected - 1]);
-  let sarga_info = $derived(kANDa_info.sarga_data[$chapter_selected - 1]);
-  let shloka_count = $derived(sarga_info.shloka_count_extracted);
+  let chapter_info = $derived(gita_map[$chapter_selected - 1]);
+  let shloka_count = $derived(chapter_info.shloka_count);
 
   let show_time_status = $state(false);
 
@@ -73,10 +71,7 @@
       $added_translations_indexes = $added_translations_indexes;
       if ($trans_lang !== 0) await query_client.setQueryData($trans_lang_data_query_key, new_data);
       else
-        await query_client.setQueryData(
-          QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $chapter_selected),
-          new_data
-        );
+        await query_client.setQueryData(QUERY_KEYS.trans_lang_data(1, $chapter_selected), new_data);
       show_time_status = true;
     }
   });
@@ -116,10 +111,8 @@
             {
               text,
               lang: $trans_lang !== 0 ? LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)] : 'English',
-              sarga_name: sarga_info.name_normal,
-              sarga_num: sarga_info.index,
-              kANDa_name: kANDa_info.name_normal,
-              kANDa_num: kANDa_info.index
+              chapter_name: chapter_info.name_normal,
+              chapter_num: chapter_info.index
             }
           )
         }

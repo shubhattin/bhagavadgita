@@ -32,7 +32,7 @@
 <AppBar>
   {#snippet lead()}
     {@render start?.()}
-    {#if route_id !== '/(main)/[[kANDa]]/[[sarga]]' || page.error}
+    {#if route_id !== '/(main)/[[chapter]]' || page.error}
       <a class="mr-2 text-xl" href="/" title="श्रीरामायणम्">
         <Icon
           src={BiArrowBack}

@@ -3,24 +3,22 @@
   import { page } from '$app/state';
   import { z } from 'zod';
   import MainPage from '~/components/pages/main_page/MainPage.svelte';
-  import { kANDa_selected, sarga_selected } from '~/state/main_page/main_state';
-  import type { PageData chapter_selectedes';
+  import { chapter_selected } from '~/state/main_page/main_state';
+  import type { PageData } from './$types';
 
   let { data }: { data: PageData } = $props();
 
-  const params_schema = z.object({chapter_selected
-    kANDa: z.coerce.number().int().optional().default(0),
-    sarga: z.coerce.number().int().optional().default(0)
+  const params_schema = z.object({
+    chapter: z.coerce.number().int().optional().default(0)
   });
 
   const params = $derived(params_schema.parse(page.params));
-  function set_kanda_sarga() {
-    $kANDa_selected = params.kANDa;
-    $sarga_selected = params.sarga;
+  function set_chapter() {
+    $chapter_selected = params.chapter;
   }
-  set_kanda_sarga();
+  set_chapter();
   $effect(() => {
-    if (browser) set_kanda_sarga();
+    if (browser) set_chapter();
   });
 </script>
 

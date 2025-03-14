@@ -7,7 +7,6 @@ export const load: PageServerLoad = async ({ params }) => {
     chapter_num: z.coerce.number().int().min(1).max(18).optional()
   });
   const params_data = params_schema.safeParse(params);
-
   if (!params_data.success) {
     error(404, {
       message: `Chapter '${params.chapter}' not found`

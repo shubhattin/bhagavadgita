@@ -142,8 +142,11 @@ export async function get_sarga_data(chapter_num: number) {
   // ^ This is to prevent this to be bundled in edge functions as it a limit of 1mb(gzip)
   const glob_path = `/data/gita/data/*.json` as const;
   const all_sargas = import.meta.glob('/data/gita/data/*.json');
-  const data = ((await all_sargas[glob_path.replace('*', `${chapter_num}`)]()) as any)
-    .default as string[];
+  const data = ((await all_sargas[glob_path.replace('*', `${chapter_num}`)]()) as any).default as {
+    text: string;
+    index: number;
+    shloka_num: number | null;
+  }[];
   await delay(350);
   return data;
 }
