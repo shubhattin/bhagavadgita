@@ -286,7 +286,7 @@
     <select class="select inline-block w-20 px-1 text-sm ring-2" bind:value={$shloka_index}>
       {#each Array(shloka_total) as _, index}
         <option value={index}
-          >{index}{$sarga_data.data![index].shloka_num &&
+          >{index}{$sarga_data.data![index]?.shloka_num &&
             ` - ${$sarga_data.data![index].shloka_num}`}</option
         >
       {/each}

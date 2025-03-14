@@ -62,7 +62,7 @@
       {#if $image_sarga_data.isSuccess && !$image_sarga_data.isFetching}
         {#each Array(shloka_total) as _, index}
           <option value={index}
-            >{index}{$image_sarga_data.data![index].shloka_num &&
+            >{index}{$image_sarga_data.data![index]?.shloka_num &&
               ` - ${$image_sarga_data.data![index].shloka_num}`}</option
           >
         {/each}

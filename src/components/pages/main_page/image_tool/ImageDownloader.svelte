@@ -63,7 +63,7 @@
       format: 'png',
       multiplier: 1 / $scaling_factor
     });
-    const name = `${$image_chapter} Shloka No. ${shloka_num ?? $image_shloka}${remove_background ? '' : ' (with background)'}.png`;
+    const name = `Chapter ${$image_chapter} Shloka No. ${shloka_num ?? $image_shloka}${remove_background ? '' : ' (with background)'}.png`;
     if (download) download_file_in_browser(url, name);
     if (remove_background) await add_background_image();
     else if ($shaded_background_image_status && restore)
@@ -88,7 +88,7 @@
       }
     });
     const blob = new Blob([svg_text], { type: 'image/svg+xml' });
-    const name = `${$image_chapter} Shloka No. ${shloka_num ?? $image_shloka}.svg`;
+    const name = `Chapter ${$image_chapter} Shloka No. ${shloka_num ?? $image_shloka}.svg`;
     if (download) {
       const svg_url = URL.createObjectURL(blob);
       download_file_in_browser(svg_url, name);
@@ -105,7 +105,7 @@
     const zip = new JSZip();
     $image_rendering_state = true;
     $zip_download_state = [0, shloka_count + 2];
-    for (let i = -1; i <= shloka_count; i++) {
+    for (let i = 0; i < shloka_count; i++) {
       await render_all_texts(i, $image_script, $image_lang);
       const { url, name } = await download_image_as_png(remove_back, false, i, false);
       const blob = dataURLToBlob(url);
@@ -118,7 +118,7 @@
     const zip_blob = await zip.generateAsync({ type: 'blob' });
     download_file_in_browser(
       URL.createObjectURL(zip_blob),
-      `${$image_chapter} PNG files${remove_back ? '' : ' (with background)'}.zip`
+      `Chapter ${$image_chapter} PNG files${remove_back ? '' : ' (with background)'}.zip`
     );
     await set_background_image_type($shaded_background_image_status);
     // ^ restore the original state
@@ -128,7 +128,7 @@
     const zip = new JSZip();
     $image_rendering_state = true;
     $zip_download_state = [0, shloka_count + 2];
-    for (let i = -1; i <= shloka_count; i++) {
+    for (let i = 0; i < shloka_count; i++) {
       await render_all_texts(i, $image_script, $image_lang);
       const { blob, name } = await download_image_as_svg(false, i);
       zip.file(name, blob);
@@ -138,7 +138,10 @@
     await render_all_texts($image_shloka, $image_script, $image_lang);
     $image_rendering_state = false;
     const zip_blob = await zip.generateAsync({ type: 'blob' });
-    download_file_in_browser(URL.createObjectURL(zip_blob), `${$image_chapter} SVG files.zip`);
+    download_file_in_browser(
+      URL.createObjectURL(zip_blob),
+      `Chapter ${$image_chapter} SVG files.zip`
+    );
     // ^ restore the original state
     $zip_download_state = null;
   };

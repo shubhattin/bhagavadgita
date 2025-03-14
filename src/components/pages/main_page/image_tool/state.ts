@@ -57,7 +57,7 @@ export const image_sarga_data = get_derived_query([image_chapter], ([$image_chap
       placeholderData: [],
       queryFn: async () => {
         return await client.translations.get_sarga_data.query({
-          chapter_num: get(chapter_selected)
+          chapter_num: $image_chapter
         });
       }
     },
