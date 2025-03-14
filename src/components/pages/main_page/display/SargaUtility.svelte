@@ -2,7 +2,7 @@
   import { browser } from '$app/environment';
   import { sarga_data, rAmAyaNam_map } from '~/state/main_page/data';
   import {
-    sarga_selected,
+    chapter_selected,
     kANDa_selected,
     BASE_SCRIPT,
     image_tool_opened,
@@ -53,10 +53,10 @@
       const translation_texts =
         await client.translations.get_all_langs_translations_per_sarga.query({
           kANDa_num: $kANDa_selected,
-          sarga_num: $sarga_selected
+          sarga_num: $chapter_selected
         });
       const shloka_count =
-        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count_extracted;
+        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$chapter_selected - 1].shloka_count_extracted;
       for (let i = 0; i < $sarga_data.data!.length; i++) {
         worksheet.getCell(i + COLUMN_FOR_DEV, TEXT_START_ROW).value = $sarga_data.data![i];
         worksheet.getCell(i + COLUMN_FOR_DEV, 1).value = i === shloka_count + 1 ? -1 : i;
@@ -75,7 +75,7 @@
 
       // saving file to output path
       let sarga_name =
-        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split(
+        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$chapter_selected - 1].name_normal.split(
           '\n'
         )[0];
       const buffer = await workbook.xlsx.writeBuffer();
@@ -83,7 +83,7 @@
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       });
       current_dowbload_link = URL.createObjectURL(blob);
-      current_file_name = `${$kANDa_selected}-${$sarga_selected}. ${sarga_name}.xlsx`;
+      current_file_name = `${$kANDa_selected}-${$chapter_selected}. ${sarga_name}.xlsx`;
       current_workbook = workbook;
       excel_preview_opened = true;
     }
@@ -103,11 +103,11 @@
       const blob = new Blob([text], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const sarga_name_normal =
-        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split(
+        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$chapter_selected - 1].name_normal.split(
           '\n'
         )[0];
       const sarga_name_script = await lipi_parivartak(
-        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_devanagari.split(
+        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$chapter_selected - 1].name_devanagari.split(
           '\n'
         )[0],
         BASE_SCRIPT,
@@ -116,7 +116,7 @@
       const is_not_brahmic_script = ['Normal', 'Romanized'].includes($viewing_script);
       download_file_in_browser(
         url,
-        `${$kANDa_selected}-${$sarga_selected} ${sarga_name_script}${is_not_brahmic_script ? '' : ` (${sarga_name_normal})`}.txt`
+        `${$kANDa_selected}-${$chapter_selected} ${sarga_name_script}${is_not_brahmic_script ? '' : ` (${sarga_name_normal})`}.txt`
       );
     }
   });

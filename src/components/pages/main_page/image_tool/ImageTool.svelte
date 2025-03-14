@@ -10,7 +10,7 @@
     set_background_image_type,
     IMAGE_DIMENSIONS,
     image_kANDa,
-    image_sarga,
+    image_chapter,
     image_script,
     image_lang,
     image_shloka,
@@ -22,13 +22,13 @@
     image_rendering_state
   } from './state';
   import {
-    sarga_selected,
+    chapter_selected,
     kANDa_selected,
     viewing_script,
     trans_lang,
     image_tool_opened
   } from '~/state/main_page/main_state';
-  import { get_kANDa_names, get_sarga_names, rAmAyaNam_map } from '~/state/main_page/data';
+  import { get_kANDa_names, get_chapter_names, rAmAyaNam_map } from '~/state/main_page/data';
   import Select from '~/components/Select.svelte';
   import Icon from '~/tools/Icon.svelte';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
@@ -43,7 +43,7 @@
 
   // in our case we dont need to initialize inside of onMount
   $image_kANDa = $kANDa_selected;
-  $image_sarga = $sarga_selected;
+  $image_chapter = $chapter_selected;
   $image_script = $viewing_script;
   if ($trans_lang !== 0) $image_lang = $trans_lang;
 
@@ -65,12 +65,12 @@
   });
   let sarga_names: string[] = $state([]);
   $effect(() => {
-    get_sarga_names($image_kANDa, $image_script).then((names) => (sarga_names = names));
+    get_chapter_names($image_kANDa, $image_script).then((names) => (sarga_names = names));
   });
 
   $effect(() => {
     if ($image_kANDa && untrack(() => mounted)) {
-      $image_sarga = 1;
+      $image_chapter = 1;
       $image_shloka = 1;
     }
   });
@@ -79,7 +79,7 @@
   });
 
   $effect(() => {
-    if ($image_sarga) {
+    if ($image_chapter) {
       $image_shloka = 1;
       // reset after change
     }
@@ -218,7 +218,7 @@
       !$image_trans_data.isFetching &&
       $image_trans_data.isSuccess &&
       $SPACE_ABOVE_REFERENCE_LINE &&
-      $image_sarga &&
+      $image_chapter &&
       $image_kANDa &&
       $shloka_configs &&
       $normal_text_font_config &&
@@ -255,8 +255,8 @@
     <div class="inline-block space-x-1">
       <button
         class="btn p-0"
-        disabled={$image_sarga === 1 || sarga_loading}
-        onclick={() => ($image_sarga -= 1)}
+        disabled={$image_chapter === 1 || sarga_loading}
+        onclick={() => ($image_chapter -= 1)}
       >
         <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
       </button>
@@ -264,7 +264,7 @@
         class={`${get_text_font_class($image_script)} select inline-block w-40 p-1 text-sm ring-2`}
         zodType={z.coerce.number().int()}
         disabled={sarga_loading}
-        bind:value={$image_sarga}
+        bind:value={$image_chapter}
         options={sarga_names.map((name, index) => ({
           value: index + 1,
           text: `${index + 1} ${name}`
@@ -272,8 +272,8 @@
       />
       <button
         class="btn p-0"
-        onclick={() => ($image_sarga += 1)}
-        disabled={$image_sarga === rAmAyaNam_map[$image_kANDa - 1].sarga_count || sarga_loading}
+        onclick={() => ($image_chapter += 1)}
+        disabled={$image_chapter === rAmAyaNam_map[$image_kANDa - 1].sarga_count || sarga_loading}
       >
         <Icon src={TiArrowForwardOutline} class="-mt-1 text-lg" />
       </button>

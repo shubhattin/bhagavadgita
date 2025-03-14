@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createMutation, useQueryClient } from '@tanstack/svelte-query';
   import {
-    sarga_selected,
+    chapter_selected,
     kANDa_selected,
     trans_lang,
     editing_status_on,
@@ -46,7 +46,7 @@
           to_add_indexed: added_indexes,
           to_edit_indexed: edited_indexes
         },
-        sarga_num: $sarga_selected,
+        sarga_num: $chapter_selected,
         kANDa_num: $kANDa_selected,
         lang_id: $trans_lang !== 0 ? $trans_lang : 1
       });
@@ -72,7 +72,7 @@
       await query_client.invalidateQueries({
         queryKey: !$english_edit_status
           ? $trans_lang_data_query_key
-          : QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $sarga_selected)
+          : QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $chapter_selected)
       });
       $added_translations_indexes = [];
       $edited_translations_indexes = new Set();

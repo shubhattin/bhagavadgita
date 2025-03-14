@@ -9,7 +9,7 @@
     trans_lang,
     typing_assistance_modal_opened,
     kANDa_selected,
-    sarga_selected,
+    chapter_selected,
     view_translation_status,
     added_translations_indexes,
     edited_translations_indexes,
@@ -60,7 +60,7 @@
       const new_data = new Map($trans_en_data.data);
       new_data.set(index, text);
       await query_client.setQueryData(
-        QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $sarga_selected),
+        QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $chapter_selected),
         new_data
       );
     }

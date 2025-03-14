@@ -2,7 +2,7 @@
   import { rAmAyaNam_map } from '~/state/main_page/data';
   import {
     image_kANDa,
-    image_sarga,
+    image_chapter,
     image_script,
     image_shloka,
     scaling_factor,
@@ -26,7 +26,7 @@
   import { cl_join } from '~/tools/cl_join';
 
   let kANDa_info = $derived(rAmAyaNam_map[$image_kANDa - 1]);
-  let shloka_count = $derived(kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted);
+  let shloka_count = $derived(kANDa_info.sarga_data[$image_chapter - 1].shloka_count_extracted);
 
   const remove_background_image = async () => {
     $canvas.getObjects().forEach((obj) => {
@@ -65,7 +65,7 @@
       format: 'png',
       multiplier: 1 / $scaling_factor
     });
-    const name = `${$image_kANDa}-${$image_sarga} Shloka No. ${shloka_num ?? $image_shloka}${remove_background ? '' : ' (with background)'}.png`;
+    const name = `${$image_kANDa}-${$image_chapter} Shloka No. ${shloka_num ?? $image_shloka}${remove_background ? '' : ' (with background)'}.png`;
     if (download) download_file_in_browser(url, name);
     if (remove_background) await add_background_image();
     else if ($shaded_background_image_status && restore)
@@ -90,7 +90,7 @@
       }
     });
     const blob = new Blob([svg_text], { type: 'image/svg+xml' });
-    const name = `${$image_kANDa}-${$image_sarga} Shloka No. ${shloka_num ?? $image_shloka}.svg`;
+    const name = `${$image_kANDa}-${$image_chapter} Shloka No. ${shloka_num ?? $image_shloka}.svg`;
     if (download) {
       const svg_url = URL.createObjectURL(blob);
       download_file_in_browser(svg_url, name);
@@ -120,7 +120,7 @@
     const zip_blob = await zip.generateAsync({ type: 'blob' });
     download_file_in_browser(
       URL.createObjectURL(zip_blob),
-      `${$image_kANDa}-${$image_sarga} PNG files${remove_back ? '' : ' (with background)'}.zip`
+      `${$image_kANDa}-${$image_chapter} PNG files${remove_back ? '' : ' (with background)'}.zip`
     );
     await set_background_image_type($shaded_background_image_status);
     // ^ restore the original state
@@ -142,7 +142,7 @@
     const zip_blob = await zip.generateAsync({ type: 'blob' });
     download_file_in_browser(
       URL.createObjectURL(zip_blob),
-      `${$image_kANDa}-${$image_sarga} SVG files.zip`
+      `${$image_kANDa}-${$image_chapter} SVG files.zip`
     );
     // ^ restore the original state
     $zip_download_state = null;

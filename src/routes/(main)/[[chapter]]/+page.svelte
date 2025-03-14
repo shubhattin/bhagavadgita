@@ -4,11 +4,11 @@
   import { z } from 'zod';
   import MainPage from '~/components/pages/main_page/MainPage.svelte';
   import { kANDa_selected, sarga_selected } from '~/state/main_page/main_state';
-  import type { PageData } from './$types';
+  import type { PageData chapter_selectedes';
 
   let { data }: { data: PageData } = $props();
 
-  const params_schema = z.object({
+  const params_schema = z.object({chapter_selected
     kANDa: z.coerce.number().int().optional().default(0),
     sarga: z.coerce.number().int().optional().default(0)
   });

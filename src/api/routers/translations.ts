@@ -1,7 +1,6 @@
 import { t, publicProcedure, protectedProcedure, protectedAdminProcedure } from '~/api/trpc_init';
 import { db } from '~/db/db';
 import { translations } from '~/db/schema';
-import type { lang_list_type } from '~/tools/lang_list';
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { fetch_post } from '~/tools/fetch';
@@ -13,22 +12,17 @@ const get_translations_per_sarga_route = publicProcedure
   .input(
     z.object({
       lang_id: z.number().int(),
-      kANDa_num: z.number().int(),
-      sarga_num: z.number().int()
+      chapter_num: z.number().int().min(1).max(18)
     })
   )
-  .query(async ({ input: { lang_id, kANDa_num, sarga_num } }) => {
+  .query(async ({ input: { lang_id, chapter_num } }) => {
     const data = await db.query.translations.findMany({
       columns: {
         text: true,
         shloka_num: true
       },
       where: (struct, { eq, and }) =>
-        and(
-          eq(struct.lang_id, lang_id),
-          eq(struct.kANDa_num, kANDa_num),
-          eq(struct.sarga_num, sarga_num)
-        )
+        and(eq(struct.lang_id, lang_id), eq(struct.chapter_num, chapter_num))
     });
     const data_map = new Map<number, string>();
     for (let i = 0; i < data.length; i++) data_map.set(data[i].shloka_num, data[i].text);
@@ -38,18 +32,17 @@ const get_translations_per_sarga_route = publicProcedure
 const get_all_langs_translations_per_sarga_route = publicProcedure
   .input(
     z.object({
-      kANDa_num: z.number().int(),
-      sarga_num: z.number().int()
+      chapter_num: z.number().int().min(1).max(18)
     })
   )
-  .query(async ({ input: { kANDa_num, sarga_num } }) => {
+  .query(async ({ input: { chapter_num } }) => {
     const data = await db.query.translations.findMany({
       columns: {
         lang_id: true,
         text: true,
         shloka_num: true
       },
-      where: (struct, { eq }) => eq(struct.kANDa_num, kANDa_num) && eq(struct.sarga_num, sarga_num)
+      where: (struct, { eq }) => eq(struct.chapter_num, chapter_num)
     });
     const data_map = new Map<number, Map<number, string>>();
     for (let i = 0; i < data.length; i++) {
@@ -63,8 +56,7 @@ const edit_translation_route = protectedProcedure
   .input(
     z.object({
       lang_id: z.number().int(),
-      kANDa_num: z.number().int(),
-      sarga_num: z.number().int(),
+      chapter_num: z.number().int().min(1).max(18),
       data: z.object({
         to_add_indexed: z.number().int().array(),
         to_edit_indexed: z.number().int().array(),
@@ -78,8 +70,7 @@ const edit_translation_route = protectedProcedure
       ctx: { user, cookie },
       input: {
         lang_id,
-        kANDa_num,
-        sarga_num,
+        chapter_num,
         data: { add_data, edit_data, to_add_indexed, to_edit_indexed }
       }
     }) => {
@@ -95,8 +86,7 @@ const edit_translation_route = protectedProcedure
       if (to_add_indexed.length > 0) {
         const data_to_add = to_add_indexed.map((index, i) => ({
           lang_id: lang_id,
-          kANDa_num,
-          sarga_num,
+          chapter_num,
           shloka_num: index,
           text: add_data[i]
         }));
@@ -115,8 +105,7 @@ const edit_translation_route = protectedProcedure
             .where(
               and(
                 eq(translations.lang_id, lang_id),
-                eq(translations.kANDa_num, kANDa_num),
-                eq(translations.sarga_num, sarga_num),
+                eq(translations.chapter_num, chapter_num),
                 eq(translations.shloka_num, index)
               )
             )
@@ -149,11 +138,11 @@ const trigger_translations_update_route = protectedAdminProcedure.mutation(async
   return req.ok;
 });
 
-export async function get_sarga_data(kANDa_num: number, sarga_num: number) {
+export async function get_sarga_data(chapter_num: number) {
   // ^ This is to prevent this to be bundled in edge functions as it a limit of 1mb(gzip)
-  const glob_path = `/data/gita/data/*/*.json` as const;
-  const all_sargas = import.meta.glob('/data/gita/data/*/*.json');
-  const data = ((await all_sargas[glob_path.replace('*/*', `${kANDa_num}/${sarga_num}`)]()) as any)
+  const glob_path = `/data/gita/data/*.json` as const;
+  const all_sargas = import.meta.glob('/data/gita/data/*.json');
+  const data = ((await all_sargas[glob_path.replace('*', `${chapter_num}`)]()) as any)
     .default as string[];
   await delay(350);
   return data;
@@ -162,12 +151,11 @@ export async function get_sarga_data(kANDa_num: number, sarga_num: number) {
 const get_sarga_data_route = publicProcedure
   .input(
     z.object({
-      kANDa_num: z.number().int(),
-      sarga_num: z.number().int()
+      chapter_num: z.number().int().min(1).max(18)
     })
   )
-  .query(async ({ input: { kANDa_num, sarga_num } }) => {
-    return await get_sarga_data(kANDa_num, sarga_num);
+  .query(async ({ input: { chapter_num } }) => {
+    return await get_sarga_data(chapter_num);
   });
 
 export const translations_router = t.router({

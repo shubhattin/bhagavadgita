@@ -1,8 +1,7 @@
 import type { script_list_type } from '~/tools/lang_list';
 import { writable } from 'svelte/store';
 
-export let kANDa_selected = writable(0);
-export let sarga_selected = writable(0);
+export let chapter_selected = writable(0);
 
 export const BASE_SCRIPT = 'Devanagari';
 

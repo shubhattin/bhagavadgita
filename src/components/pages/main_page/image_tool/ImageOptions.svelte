@@ -6,7 +6,7 @@
     image_kANDa,
     image_lang,
     image_rendering_state,
-    image_sarga,
+    image_chapter,
     image_script,
     image_shloka,
     image_trans_data,
@@ -32,7 +32,7 @@
   import { copy_plain_object } from '~/tools/kry';
 
   let kANDa_info = $derived(rAmAyaNam_map[$image_kANDa - 1]);
-  let shloka_count = $derived(kANDa_info.sarga_data[$image_sarga - 1].shloka_count_extracted);
+  let shloka_count = $derived(kANDa_info.sarga_data[$image_chapter - 1].shloka_count_extracted);
 
   let settings_tab: 'depend' | 'non-depend' = $state('non-depend');
 
