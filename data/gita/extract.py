@@ -19,7 +19,7 @@ def extract_data_from_text(text: str, file_index: int):
     ]
     for line in lines:
         line = line.strip()
-        line = re.sub(r"(?<=\d){0}$".format(DOUBLE_VIRAMA), f" {DOUBLE_VIRAMA}", line)
+        line = re.sub(r"(?<={0}) (?=\d)".format(DOUBLE_VIRAMA), "", line)
         line_word_count = len(
             line.replace(DOUBLE_VIRAMA, "")
             .replace(SINGLE_VIRAMA, "")

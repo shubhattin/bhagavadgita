@@ -12,7 +12,8 @@
     main_text_font_configs,
     normal_text_font_config,
     shaded_background_image_status,
-    trans_text_font_configs
+    trans_text_font_configs,
+    image_sarga_data
   } from './state';
   import { LANG_LIST, LANG_LIST_IDS, type lang_list_type } from '~/tools/lang_list';
   import Icon from '~/tools/Icon.svelte';
@@ -30,7 +31,7 @@
   } from './settings';
   import { copy_plain_object } from '~/tools/kry';
 
-  let shloka_count = $derived(gita_map[$image_chapter - 1].total);
+  let shloka_total = $derived(gita_map[$image_chapter - 1].total);
 
   let settings_tab: 'depend' | 'non-depend' = $state('non-depend');
 
@@ -52,22 +53,25 @@
       disabled={$image_shloka === 0 || $image_rendering_state}
       onclick={() => {
         if ($image_shloka !== -1) $image_shloka--;
-        else $image_shloka = shloka_count;
+        else $image_shloka = shloka_total;
       }}
     >
       <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
     </button>
-    <select class="select inline-block w-14 p-1 text-sm ring-2" bind:value={$image_shloka}>
-      <option value={0}>0</option>
-      {#each Array(shloka_count) as _, index}
-        <option value={index + 1}>{index + 1}</option>
-      {/each}
-      <option value={-1}>-1</option>
+    <select class="select inline-block w-20 p-1 text-sm ring-2" bind:value={$image_shloka}>
+      {#if $image_sarga_data.isSuccess && !$image_sarga_data.isFetching}
+        {#each Array(shloka_total) as _, index}
+          <option value={index}
+            >{index}{$image_sarga_data.data![index].shloka_num &&
+              ` - ${$image_sarga_data.data![index].shloka_num}`}</option
+          >
+        {/each}
+      {/if}
     </select>
     <button
       class="btn p-0"
       onclick={() => {
-        if ($image_shloka !== shloka_count) $image_shloka++;
+        if ($image_shloka !== shloka_total) $image_shloka++;
         else $image_shloka = -1;
       }}
       disabled={$image_shloka === -1 || $image_rendering_state}

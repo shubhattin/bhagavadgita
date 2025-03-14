@@ -67,7 +67,7 @@
 
   $effect(() => {
     if ($image_chapter) {
-      $image_shloka = 1;
+      $image_shloka = 4;
       // reset after change
     }
   });

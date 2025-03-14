@@ -19,13 +19,13 @@ const get_translations_per_sarga_route = publicProcedure
     const data = await db.query.translations.findMany({
       columns: {
         text: true,
-        shloka_num: true
+        index: true
       },
       where: (struct, { eq, and }) =>
         and(eq(struct.lang_id, lang_id), eq(struct.chapter_num, chapter_num))
     });
     const data_map = new Map<number, string>();
-    for (let i = 0; i < data.length; i++) data_map.set(data[i].shloka_num, data[i].text);
+    for (let i = 0; i < data.length; i++) data_map.set(data[i].index, data[i].text);
     return data_map;
   });
 
@@ -40,14 +40,14 @@ const get_all_langs_translations_per_sarga_route = publicProcedure
       columns: {
         lang_id: true,
         text: true,
-        shloka_num: true
+        index: true
       },
       where: (struct, { eq }) => eq(struct.chapter_num, chapter_num)
     });
     const data_map = new Map<number, Map<number, string>>();
     for (let i = 0; i < data.length; i++) {
       if (!data_map.has(data[i].lang_id)) data_map.set(data[i].lang_id, new Map());
-      data_map.get(data[i].lang_id)!.set(data[i].shloka_num, data[i].text);
+      data_map.get(data[i].lang_id)!.set(data[i].index, data[i].text);
     }
     return data_map;
   });
@@ -87,7 +87,7 @@ const edit_translation_route = protectedProcedure
         const data_to_add = to_add_indexed.map((index, i) => ({
           lang_id: lang_id,
           chapter_num,
-          shloka_num: index,
+          index: index,
           text: add_data[i]
         }));
         await db.insert(translations).values(data_to_add);
@@ -106,7 +106,7 @@ const edit_translation_route = protectedProcedure
               and(
                 eq(translations.lang_id, lang_id),
                 eq(translations.chapter_num, chapter_num),
-                eq(translations.shloka_num, index)
+                eq(translations.index, index)
               )
             )
         );

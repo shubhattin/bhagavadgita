@@ -283,7 +283,7 @@
     >
       <Icon src={TiArrowBackOutline} class="-mt-1 text-lg" />
     </button>
-    <select class="select inline-block w-19 px-1 text-sm ring-2" bind:value={$shloka_index}>
+    <select class="select inline-block w-20 px-1 text-sm ring-2" bind:value={$shloka_index}>
       {#each Array(shloka_total) as _, index}
         <option value={index}
           >{index}{$sarga_data.data![index].shloka_num &&
@@ -416,7 +416,7 @@
           classes="inline-block -mb-2"
           meterBase="stroke-primary-500"
           trackBase="stroke-primary-500/30"
-          strokeWidth="5px"
+          strokeWidth="15px"
         />
       {:else if show_image_time_status && $image_q.isSuccess}
         <span class="ml-4 text-xs text-stone-500 select-none dark:text-stone-300">
