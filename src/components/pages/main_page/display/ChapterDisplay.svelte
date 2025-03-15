@@ -34,7 +34,7 @@
   import { get_font_family_and_size } from '~/tools/font_tools';
   import { LANG_LIST, LANG_LIST_IDS, type lang_list_type } from '~/tools/lang_list';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
-  import SargaAiTranslate from './ai_sarga_translate/SargaAITranslate.svelte';
+  import SargaAiTranslate from './ai_sarga_translate/ChapterAITranslate.svelte';
   import { Popover, Tabs } from '@skeletonlabs/skeleton-svelte';
   import BulkEdit from './bulk/BulkEdit.svelte';
 

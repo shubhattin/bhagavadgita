@@ -8,7 +8,7 @@
   import { load_parivartak_lang_data, lipi_parivartak, get_sa_mode } from '~/tools/converter';
   import { LanguageIcon } from '~/components/icons';
   import { browser } from '$app/environment';
-  import SargaDisplay from './display/SargaDisplay.svelte';
+  import SargaDisplay from './display/ChapterDisplay.svelte';
   import { BiEdit, BiHelpCircle } from 'svelte-icons-pack/bi';
   import { scale, slide } from 'svelte/transition';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
@@ -251,7 +251,7 @@
       />
     </label>
     {#if $chapter_selected !== 0}
-      {#await import('./display/SargaUtility.svelte') then SargaUtility}
+      {#await import('./display/ChapterUtility.svelte') then SargaUtility}
         <SargaUtility.default />
       {/await}
     {/if}
