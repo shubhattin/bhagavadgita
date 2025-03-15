@@ -36,7 +36,7 @@
   let excel_preview_opened = $state(false);
 
   const download_excel_file = createMutation({
-    mutationKey: ['sarga', 'download_excel_data'],
+    mutationKey: ['chapter', 'download_excel_data'],
     mutationFn: async () => {
       if (!browser) return;
       // the method used below creates a url for both dev and prod
@@ -50,7 +50,7 @@
       const COLUMN_FOR_DEV = 2;
       const TEXT_START_ROW = 2;
       const translation_texts =
-        await client.translations.get_all_langs_translations_per_sarga.query({
+        await client.translations.get_all_langs_translations_per_chapter.query({
           chapter_num: $chapter_selected
         });
       const shloka_count = gita_map[$chapter_selected - 1].total;
@@ -84,7 +84,7 @@
   });
 
   const download_text_file = createMutation({
-    mutationKey: ['sarga', 'download_text_data'],
+    mutationKey: ['chapter', 'download_text_data'],
     mutationFn: async () => {
       if (!browser) return;
       const text = (

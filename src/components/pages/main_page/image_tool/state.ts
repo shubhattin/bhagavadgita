@@ -43,7 +43,7 @@ export async function set_background_image_type(shaded_image: boolean) {
 export let image_script = writable<script_list_type>();
 export let image_lang = writable<number>(lang_list_obj.English);
 export let image_chapter = writable<number>(0);
-// ^ kanda and sarga will be inherited from the main during mount
+// ^ chapter will be inherited from the main during mount
 export let image_shloka = writable<number>(1);
 export let image_rendering_state = writable<boolean>(false);
 
@@ -56,7 +56,7 @@ export const image_sarga_data = get_derived_query([image_chapter], ([$image_chap
       enabled: browser && $image_chapter !== 0,
       placeholderData: [],
       queryFn: async () => {
-        return await client.translations.get_sarga_data.query({
+        return await client.translations.get_chapter_data.query({
           chapter_num: $image_chapter
         });
       }

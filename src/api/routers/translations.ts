@@ -8,7 +8,7 @@ import { env } from '$env/dynamic/private';
 import { delay } from '~/tools/delay';
 import { get_user_project_info } from '~/lib/auth-info';
 
-const get_translations_per_sarga_route = publicProcedure
+const get_translations_per_chapter_route = publicProcedure
   .input(
     z.object({
       lang_id: z.number().int(),
@@ -29,7 +29,7 @@ const get_translations_per_sarga_route = publicProcedure
     return data_map;
   });
 
-const get_all_langs_translations_per_sarga_route = publicProcedure
+const get_all_langs_translations_per_chapter_route = publicProcedure
   .input(
     z.object({
       chapter_num: z.number().int().min(1).max(18)
@@ -138,11 +138,12 @@ const trigger_translations_update_route = protectedAdminProcedure.mutation(async
   return req.ok;
 });
 
-export async function get_sarga_data(chapter_num: number) {
+export async function get_chapter_data(chapter_num: number) {
   // ^ This is to prevent this to be bundled in edge functions as it a limit of 1mb(gzip)
   const glob_path = `/data/gita/data/*.json` as const;
-  const all_sargas = import.meta.glob('/data/gita/data/*.json');
-  const data = ((await all_sargas[glob_path.replace('*', `${chapter_num}`)]()) as any).default as {
+  const all_chapters = import.meta.glob('/data/gita/data/*.json');
+  const data = ((await all_chapters[glob_path.replace('*', `${chapter_num}`)]()) as any)
+    .default as {
     text: string;
     index: number;
     shloka_num: number | null;
@@ -151,20 +152,20 @@ export async function get_sarga_data(chapter_num: number) {
   return data;
 }
 
-const get_sarga_data_route = publicProcedure
+const get_chapter_data_route = publicProcedure
   .input(
     z.object({
       chapter_num: z.number().int().min(1).max(18)
     })
   )
   .query(async ({ input: { chapter_num } }) => {
-    return await get_sarga_data(chapter_num);
+    return await get_chapter_data(chapter_num);
   });
 
 export const translations_router = t.router({
-  get_translations_per_sarga: get_translations_per_sarga_route,
+  get_translations_per_chapter: get_translations_per_chapter_route,
   edit_translation: edit_translation_route,
-  get_all_langs_translations_per_sarga: get_all_langs_translations_per_sarga_route,
+  get_all_langs_translations_per_chapter: get_all_langs_translations_per_chapter_route,
   trigger_translations_update: trigger_translations_update_route,
-  get_sarga_data: get_sarga_data_route
+  get_chapter_data: get_chapter_data_route
 });

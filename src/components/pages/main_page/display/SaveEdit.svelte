@@ -25,7 +25,7 @@
   const query_client = useQueryClient();
 
   const save_data = createMutation({
-    mutationKey: ['sarga', 'save_edited_data'],
+    mutationKey: ['chapter', 'save_edited_data'],
     mutationFn: async ({
       added_indexes,
       edited_indexes
@@ -63,7 +63,7 @@
   };
 
   const cancel_edit_data = createMutation({
-    mutationKey: ['sarga', 'cancel_edit_data'],
+    mutationKey: ['chapter', 'cancel_edit_data'],
     mutationFn: async () => {
       if (!$english_edit_status ? !$trans_lang_data.isSuccess : !$trans_en_data.isSuccess) return;
       await delay(500);

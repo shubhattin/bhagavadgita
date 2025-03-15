@@ -50,10 +50,10 @@
 
   const translate_sarga_mut = createMutation({
     mutationFn: async (
-      input: Parameters<typeof client.ai.trigger_funcs.translate_sarga.mutate>[0]
+      input: Parameters<typeof client.ai.trigger_funcs.translate_chapter.mutate>[0]
     ) => {
       show_time_status = false;
-      const { run_id, output_type } = await client.ai.trigger_funcs.translate_sarga.mutate(input);
+      const { run_id, output_type } = await client.ai.trigger_funcs.translate_chapter.mutate(input);
 
       return await get_result_from_trigger_run_id<typeof output_type>(run_id!);
     },
@@ -129,7 +129,7 @@
     popup_state={false}
     close_on_confirm={true}
     confirm_func={translate_sarga_func}
-    title={'Are You Sure to translate the sarga ?'}
+    title={'Are You Sure to translate the Chapter ?'}
     body_text={() => {
       return `This will translate the untranslated shlokas to ${$trans_lang !== 0 ? LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)] : 'English'} which you can edit and then save.`;
     }}

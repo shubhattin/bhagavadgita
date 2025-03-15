@@ -19,12 +19,12 @@ import {
 export { gita_map };
 export const QUERY_KEYS = {
   trans_lang_data: (lang_id: number, chapter_num: number) => [
-    'sarga',
+    'chapter',
     'trans',
     lang_id,
     chapter_num
   ],
-  sarga_data: (chapter_num: number) => ['sarga', 'main_dev_text', chapter_num]
+  sarga_data: (chapter_num: number) => ['chapter', 'main_dev_text', chapter_num]
 };
 
 // NAMES
@@ -44,7 +44,7 @@ export const sarga_data = get_derived_query([chapter_selected], ([$chapter_selec
       placeholderData: [],
       queryFn: async () => {
         if (!browser) return [];
-        const data = await client.translations.get_sarga_data.query({
+        const data = await client.translations.get_chapter_data.query({
           chapter_num: $chapter_selected
         });
         return data;
@@ -61,8 +61,8 @@ export const trans_en_data = get_derived_query(
     createQuery(
       {
         queryKey: QUERY_KEYS.trans_lang_data(1, $chapter_selected),
-        // by also adding the kanda and sarga they are auto invalidated
-        // so we dont have to manually invalidate it if were only sarga,trans,English
+        // by also adding the kanda and chapter they are auto invalidated
+        // so we dont have to manually invalidate it if were only chapter,trans,English
         enabled: browser && $view_translation_status && $chapter_selected !== 0,
         ...($editing_status_on
           ? {
@@ -103,7 +103,7 @@ export const trans_lang_data = get_derived_query(
 export async function get_translations(chapter: number, lang_id: number) {
   await delay(400);
 
-  const data_map = await client.translations.get_translations_per_sarga.query({
+  const data_map = await client.translations.get_translations_per_chapter.query({
     lang_id: lang_id,
     chapter_num: chapter
   });

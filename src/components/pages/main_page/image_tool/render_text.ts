@@ -286,7 +286,7 @@ const draw_bounding_and_reference_lines = async (shloka_config: shloka_type_conf
 };
 
 /**
- * Renders all text for the particular `shloka>sarga>Kanda`
+ * Renders all text for the particular `shloka>Chapter``
  */
 export const render_all_texts = async (
   $image_shloka: number,

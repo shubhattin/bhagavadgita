@@ -173,7 +173,7 @@
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <span
             transition:fade={{ duration: 150 }}
-            title="Copy Sarga Text"
+            title="Copy Chapter Text"
             onmouseenter={() => (sarga_hovered = true)}
           >
             <Icon src={OiCopy16} class="text-lg" />

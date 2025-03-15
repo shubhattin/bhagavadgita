@@ -114,7 +114,7 @@
   });
 
   $effect(() => {
-    // reset image prompt text on change of kanda, sarga or shloka
+    // reset image prompt text on change of chapter or shloka
     $chapter_selected;
     $shloka_index;
     $image_prompt = '';
