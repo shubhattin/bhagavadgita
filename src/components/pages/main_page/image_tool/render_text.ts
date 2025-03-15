@@ -286,7 +286,7 @@ const draw_bounding_and_reference_lines = async (shloka_config: shloka_type_conf
 };
 
 /**
- * Renders all text for the particular `shloka>sarga>Kanda`
+ * Renders all text for the particular `shloka>Chapter``
  */
 export const render_all_texts = async (
   $image_shloka: number,
@@ -320,22 +320,10 @@ export const render_all_texts = async (
   ]);
 
   // fetch shloka config
-  const shloka_data =
-    $image_sarga_data.data![
-      $image_shloka !== -1 ? $image_shloka : $image_sarga_data.data!.length - 1
-    ];
+  const shloka_data = $image_sarga_data.data![$image_shloka];
 
   const shloka_lines = (() => {
-    if ($image_shloka === 0) {
-      const words = shloka_data.split(' ');
-      const break_point = 3;
-      return [words.slice(0, break_point).join(' '), words.slice(break_point).join(' ')];
-    } else if ($image_shloka === -1) {
-      const words = shloka_data.split(' ');
-      const break_point = 4;
-      return [words.slice(0, break_point).join(' '), words.slice(break_point).join(' ')];
-    }
-    const line_split = shloka_data.split('\n');
+    const line_split = shloka_data.text.split('\n');
     const new_shloka_lines: string[] = [];
     for (let i = 0; i < line_split.length; i++) {
       const line = line_split[i];
@@ -350,15 +338,15 @@ export const render_all_texts = async (
   const canvasObjects: fabric.Object[] = [];
 
   // shloka
-  for (let i = 0; i < shloka_lines.length; i++) {
-    const main_text = await lipi_parivartak(shloka_lines[i], BASE_SCRIPT, $image_script);
+  for (let line_i = 0; line_i < shloka_lines.length; line_i++) {
+    const main_text = await lipi_parivartak(shloka_lines[line_i], BASE_SCRIPT, $image_script);
     const text_main_group = await render_text({
       text: main_text,
       font_url: get_font_url(main_text_font_info.key, 'bold'),
       font_size: shloka_config.main_text_font_size,
       font_scale: main_text_font_info.size,
       ...TEXT_CONFIGS.main_text,
-      line_index: i,
+      line_index: line_i,
       total_lines: shloka_lines.length,
       text_type: 'main',
       text_for_min_height: main_text_font_info.text_for_min_height,
@@ -367,14 +355,14 @@ export const render_all_texts = async (
       align: 'center',
       lockMovementY: false
     });
-    const norm_text = await lipi_parivartak(shloka_lines[i], BASE_SCRIPT, 'Normal');
+    const norm_text = await lipi_parivartak(shloka_lines[line_i], BASE_SCRIPT, 'Normal');
     const text_norm_group = await render_text({
       text: norm_text,
       font_url: get_font_url(norm_text_font_info.key, 'regular'),
       font_size: shloka_config.norm_text_font_size,
       font_scale: norm_text_font_info.size,
       ...TEXT_CONFIGS.norm_text,
-      line_index: i,
+      line_index: line_i,
       total_lines: shloka_lines.length,
       text_type: 'normal',
       text_for_min_height: norm_text_font_info.text_for_min_height,
@@ -384,7 +372,7 @@ export const render_all_texts = async (
       lockMovementY: false
     });
     const top_pos = get_units(
-      shloka_config.reference_lines.top + i * shloka_config.reference_lines.spacing
+      shloka_config.reference_lines.top + line_i * shloka_config.reference_lines.spacing
     );
     text_norm_group.group.set({
       top: top_pos - (text_norm_group.height + get_units($SPACE_ABOVE_REFERENCE_LINE))
@@ -398,7 +386,7 @@ export const render_all_texts = async (
     });
     canvasObjects.push(text_main_group.group);
     canvasObjects.push(text_norm_group.group);
-    if (i === shloka_lines.length - 1) {
+    if (line_i === shloka_lines.length - 1 && shloka_data.shloka_num) {
       const number_main_text = main_text.split(' ').at(-1)!;
       const number_indicator_main = await render_text({
         text: number_main_text.substring(1, number_main_text.length - 1),

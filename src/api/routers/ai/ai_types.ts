@@ -3,9 +3,7 @@ import { z } from 'zod';
 export const translation_out_schema = z
   .object({
     text: z.string().describe('The translation text'),
-    shloka_num: z
-      .number()
-      .describe('The index of shlokas to be generated, use 0 for starting and -1 for ending.')
+    index: z.number().describe('The index of shlokas to be generated, starting from 0.')
   })
   .describe(
     'This object will contain the translated text and the index of the shloka to be generated.'
@@ -13,7 +11,7 @@ export const translation_out_schema = z
 
 export const text_models_enum = z.enum(['gpt-4o', 'claude-3.7-sonnet', 'o3-mini']);
 
-export const sarga_translate_schema = {
+export const chapter_translate_schema = {
   input: z.object({
     lang_id: z.number().int(),
     model: text_models_enum,

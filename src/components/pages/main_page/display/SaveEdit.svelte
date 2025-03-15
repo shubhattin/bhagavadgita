@@ -1,8 +1,7 @@
 <script lang="ts">
   import { createMutation, useQueryClient } from '@tanstack/svelte-query';
   import {
-    sarga_selected,
-    kANDa_selected,
+    chapter_selected,
     trans_lang,
     editing_status_on,
     added_translations_indexes,
@@ -26,7 +25,7 @@
   const query_client = useQueryClient();
 
   const save_data = createMutation({
-    mutationKey: ['sarga', 'save_edited_data'],
+    mutationKey: ['chapter', 'save_edited_data'],
     mutationFn: async ({
       added_indexes,
       edited_indexes
@@ -46,8 +45,7 @@
           to_add_indexed: added_indexes,
           to_edit_indexed: edited_indexes
         },
-        sarga_num: $sarga_selected,
-        kANDa_num: $kANDa_selected,
+        chapter_num: $chapter_selected,
         lang_id: $trans_lang !== 0 ? $trans_lang : 1
       });
       if (res.success) {
@@ -65,14 +63,14 @@
   };
 
   const cancel_edit_data = createMutation({
-    mutationKey: ['sarga', 'cancel_edit_data'],
+    mutationKey: ['chapter', 'cancel_edit_data'],
     mutationFn: async () => {
       if (!$english_edit_status ? !$trans_lang_data.isSuccess : !$trans_en_data.isSuccess) return;
       await delay(500);
       await query_client.invalidateQueries({
         queryKey: !$english_edit_status
           ? $trans_lang_data_query_key
-          : QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $sarga_selected)
+          : QUERY_KEYS.trans_lang_data(1, $chapter_selected)
       });
       $added_translations_indexes = [];
       $edited_translations_indexes = new Set();
@@ -112,9 +110,9 @@
     </div>
     <div>
       <span class="font-semibold">Additions ➔ {added_indexes.length}</span>
-      {#if added_indexes.length > 0}
+      <!-- {#if added_indexes.length > 0}
         <span>{`{ ${added_indexes.join(', ')} }`}</span>
-      {/if}
+      {/if} -->
     </div>
   {/snippet}
 </ConfirmModal>
@@ -147,9 +145,9 @@
     </div>
     <div>
       <span class="font-semibold">Additions ➔ {added_indexes.length}</span>
-      {#if added_indexes.length > 0}
+      <!-- {#if added_indexes.length > 0}
         <span>{`{ ${added_indexes.join(', ')} }`}</span>
-      {/if}
+      {/if} -->
     </div>
   {/snippet}
 </ConfirmModal>

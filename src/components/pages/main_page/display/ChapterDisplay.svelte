@@ -8,8 +8,7 @@
     viewing_script,
     trans_lang,
     typing_assistance_modal_opened,
-    kANDa_selected,
-    sarga_selected,
+    chapter_selected,
     view_translation_status,
     added_translations_indexes,
     edited_translations_indexes,
@@ -35,7 +34,7 @@
   import { get_font_family_and_size } from '~/tools/font_tools';
   import { LANG_LIST, LANG_LIST_IDS, type lang_list_type } from '~/tools/lang_list';
   import { RiSystemAddLargeLine } from 'svelte-icons-pack/ri';
-  import SargaAiTranslate from './ai_sarga_translate/SargaAITranslate.svelte';
+  import SargaAiTranslate from './ai_sarga_translate/ChapterAITranslate.svelte';
   import { Popover, Tabs } from '@skeletonlabs/skeleton-svelte';
   import BulkEdit from './bulk/BulkEdit.svelte';
 
@@ -45,10 +44,12 @@
   let transliterated_sarga_data = $state<string[]>([]);
   $effect(() => {
     // console.time('transliterate_sarga_data');
-    lipi_parivartak($sarga_data.data ?? [], BASE_SCRIPT, $viewing_script).then((data) => {
-      // console.timeEnd('transliterate_sarga_data');
-      transliterated_sarga_data = data;
-    });
+    lipi_parivartak($sarga_data.data?.map((v) => v.text) ?? [], BASE_SCRIPT, $viewing_script).then(
+      (data) => {
+        // console.timeEnd('transliterate_sarga_data');
+        transliterated_sarga_data = data;
+      }
+    );
   });
 
   async function update_trans_lang_data(index: number, text: string) {
@@ -59,10 +60,7 @@
     } else {
       const new_data = new Map($trans_en_data.data);
       new_data.set(index, text);
-      await query_client.setQueryData(
-        QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $sarga_selected),
-        new_data
-      );
+      await query_client.setQueryData(QUERY_KEYS.trans_lang_data(1, $chapter_selected), new_data);
     }
   }
   // clipboard related
@@ -86,8 +84,12 @@
   const copy_sarga_with_transliteration_and_translation = async () => {
     const texts_to_copy = await Promise.all(
       transliterated_sarga_data.map(async (shloka_lines, i) => {
-        const normal_shloka = await lipi_parivartak($sarga_data.data![i], BASE_SCRIPT, 'Normal');
-        const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i;
+        const normal_shloka = await lipi_parivartak(
+          $sarga_data.data![i].text,
+          BASE_SCRIPT,
+          'Normal'
+        );
+        const trans_index = i;
         let txt = `${shloka_lines}\n${normal_shloka}`;
         const lang_data = $trans_lang === 0 ? $trans_en_data.data : $trans_lang_data.data;
         if (lang_data && lang_data.has(trans_index)) txt += `\n\n${lang_data.get(trans_index)}`;
@@ -159,51 +161,52 @@
 {/if}
 {#if !$editing_status_on}
   <div class="relative w-full">
-    {#if sarga_hovered}
-      <Popover
-        open={copy_btn_popup_state}
-        onOpenChange={(e) => (copy_btn_popup_state = e.open)}
-        positioning={{ placement: 'bottom-end' }}
-        arrow={false}
-        triggerBase={'btn absolute top-2 right-5 z-20 p-0 outline-hidden select-none'}
-      >
-        {#snippet trigger()}
-          <button
+    <Popover
+      open={copy_btn_popup_state}
+      onOpenChange={(e) => (copy_btn_popup_state = e.open)}
+      positioning={{ placement: 'bottom-end' }}
+      arrow={false}
+      triggerBase={'btn absolute top-2 right-5 z-20 p-0 outline-hidden select-none'}
+    >
+      {#snippet trigger()}
+        {#if sarga_hovered}
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <span
             transition:fade={{ duration: 150 }}
-            title="Copy Sarga Text"
+            title="Copy Chapter Text"
             onmouseenter={() => (sarga_hovered = true)}
           >
             <Icon src={OiCopy16} class="text-lg" />
-          </button>
-        {/snippet}
-        {#snippet content()}
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <div
-            class="z-70 space-y-1 card rounded-lg bg-slate-100 p-1 shadow-xl dark:bg-surface-900"
-            onmouseenter={() => (sarga_hovered = true)}
-            onmouseleave={() => {
-              copy_btn_popup_state = false;
-            }}
+          </span>
+        {/if}
+      {/snippet}
+      {#snippet content()}
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div
+          class="z-70 space-y-1 card rounded-lg bg-slate-100 p-1 shadow-xl dark:bg-surface-900"
+          onmouseenter={() => (sarga_hovered = true)}
+          onmouseleave={() => {
+            copy_btn_popup_state = false;
+          }}
+        >
+          <button
+            onclick={copy_sarga_shlokas_only}
+            class="btn-hover block w-full rounded-md px-2 py-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
           >
-            <button
-              onclick={copy_sarga_shlokas_only}
-              class="btn-hover block w-full rounded-md px-2 py-1 text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
-            >
-              Copy Shlokas
-            </button>
-            <button
-              onclick={copy_sarga_with_transliteration_and_translation}
-              class="btn-hover block w-full rounded-md px-2 py-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
-            >
-              <div>Copy Shlokas</div>
-              <div>with</div>
-              <div>Transliteratin</div>
-              <div>and Translation</div>
-            </button>
-          </div>
-        {/snippet}
-      </Popover>
-    {/if}
+            Copy Shlokas
+          </button>
+          <button
+            onclick={copy_sarga_with_transliteration_and_translation}
+            class="btn-hover block w-full rounded-md px-2 py-1 text-xs hover:bg-gray-200 dark:hover:bg-gray-700"
+          >
+            <div>Copy Shlokas</div>
+            <div>with</div>
+            <div>Transliteratin</div>
+            <div>and Translation</div>
+          </button>
+        </div>
+      {/snippet}
+    </Popover>
   </div>
 {/if}
 
@@ -245,14 +248,18 @@
       <div transition:fade={{ duration: 250 }} class="space-y-[0.15rem]">
         {#each transliterated_sarga_data as shloka_lines, i (i)}
           <!-- with 0 and -1 index -->
-          {@const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i}
-          <div class="rounded-lg px-2 py-1 hover:bg-gray-200 dark:hover:bg-gray-800">
+          {@const trans_index = i}
+          <div class="rounded-lg px-2 py-0.5 hover:bg-gray-200 dark:hover:bg-gray-800">
             <div class="flex space-x-2">
-              {#if i !== 0 && i !== transliterated_sarga_data.length - 1}
+              {#if $sarga_data.data![i].shloka_num || (i > 2 && i < transliterated_sarga_data.length - 2)}
                 <div
                   class="flex items-center align-top text-[0.75rem] leading-[1.5rem] text-gray-500 select-none dark:text-gray-300"
                 >
-                  {i}
+                  {#if $sarga_data.data![i].shloka_num}
+                    {$sarga_data.data![i].shloka_num}
+                  {:else}
+                    <span class="inline-block w-8"></span>
+                  {/if}
                 </div>
               {/if}
               <div class="mt-0 w-full space-y-1">
@@ -299,7 +306,7 @@
               $added_translations_indexes.push(trans_index);
               $added_translations_indexes = $added_translations_indexes;
             }}
-            class="btn-hover m-0 rounded-md bg-surface-500 px-1 py-[0.05rem] font-bold text-white dark:bg-surface-500"
+            class="btn-hover rounded-md bg-surface-500 px-1 py-[0.05rem] font-bold text-white dark:bg-surface-500"
           >
             <Icon src={RiSystemAddLargeLine} />
           </button>
@@ -337,7 +344,7 @@
               $added_translations_indexes.push(trans_index);
               $added_translations_indexes = $added_translations_indexes;
             }}
-            class="btn-hover m-0 my-[0.05rem] rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
+            class="btn-hover my-[0.05rem] rounded-md bg-surface-500 px-1 py-0 font-bold text-white dark:bg-surface-500"
           >
             <Icon src={RiSystemAddLargeLine} />
           </button>

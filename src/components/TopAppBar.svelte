@@ -32,7 +32,7 @@
 <AppBar>
   {#snippet lead()}
     {@render start?.()}
-    {#if route_id !== '/(main)/[[kANDa]]/[[sarga]]' || page.error}
+    {#if route_id !== '/(main)/[[chapter]]' || page.error}
       <a class="mr-2 text-xl" href="/" title="श्रीरामायणम्">
         <Icon
           src={BiArrowBack}
@@ -77,7 +77,7 @@
       positioning={{ placement: 'bottom' }}
       arrow={false}
       contentBase="card z-50 space-y-1 sm:space-y-1.5 rounded-lg px-3 py-2 shadow-xl bg-surface-100-900"
-      triggerBase="btn m-0 p-0 gap-0 outline-hidden select-none"
+      triggerBase="btn p-0 gap-0 outline-hidden select-none"
     >
       {#snippet trigger()}
         <Icon
@@ -117,7 +117,7 @@
           <span>The Sanskrit Channel</span>
         </a>
         <a
-          href="https://github.com/shubhattin/valmiki_ramayanam"
+          href="https://github.com/shubhattin/bhagvadgita"
           target="_blank"
           rel="noopener noreferrer"
           class="group flex space-x-1 rounded-md px-2 py-1 text-sm hover:bg-gray-200 sm:text-base dark:hover:bg-gray-700"

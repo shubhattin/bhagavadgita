@@ -2,15 +2,15 @@ import { z } from 'zod';
 import { env } from '$env/dynamic/private';
 import { protectedProcedure, t } from '~/api/trpc_init';
 import { tasks, auth, runs } from '@trigger.dev/sdk/v3';
-import { sarga_translate_schema } from '~/api/routers/ai/ai_types';
+import { chapter_translate_schema } from '~/api/routers/ai/ai_types';
 import { get_user_project_info } from '~/lib/auth-info';
 
 auth.configure({
   secretKey: env.TRIGGER_SECRET_KEY
 });
 
-const translate_sarga_route = protectedProcedure
-  .input(sarga_translate_schema.input)
+const translate_chapter_route = protectedProcedure
+  .input(chapter_translate_schema.input)
   .mutation(async ({ ctx: { user, cookie }, input: { lang_id, messages, model } }) => {
     if (user.role !== 'admin') {
       const data = await get_user_project_info(user.id, cookie);
@@ -18,7 +18,7 @@ const translate_sarga_route = protectedProcedure
       const allowed_langs = data.langugaes.map((lang) => lang.lang_id);
       if (!allowed_langs || !allowed_langs.includes(lang_id)) return { success: false };
     }
-    const handle = await tasks.trigger('ai_translate_sarga', {
+    const handle = await tasks.trigger('gita_ai_translate_chapter', {
       lang_id,
       messages,
       model
@@ -26,7 +26,7 @@ const translate_sarga_route = protectedProcedure
 
     const run_id = handle.id;
 
-    return { run_id, output_type: null! as z.infer<typeof sarga_translate_schema.output> };
+    return { run_id, output_type: null! as z.infer<typeof chapter_translate_schema.output> };
   });
 
 const retrive_run_info_route = protectedProcedure
@@ -56,6 +56,6 @@ const retrive_run_info_route = protectedProcedure
   });
 
 export const trigger_funcs_router = t.router({
-  translate_sarga: translate_sarga_route,
+  translate_chapter: translate_chapter_route,
   retrive_run_info: retrive_run_info_route
 });

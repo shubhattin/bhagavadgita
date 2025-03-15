@@ -31,7 +31,7 @@ jobs:
           npx tsx backup_db_data.ts --only-trans
       - name: Organize Translations
         run: |
-          npx tsx data/ramayan/organize_translation_folder.ts
+          npx tsx data/gita/organize_translation_folder.ts
 
       - name: Configure Git
         run: |

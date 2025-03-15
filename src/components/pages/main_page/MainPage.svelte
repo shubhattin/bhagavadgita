@@ -8,7 +8,7 @@
   import { load_parivartak_lang_data, lipi_parivartak, get_sa_mode } from '~/tools/converter';
   import { LanguageIcon } from '~/components/icons';
   import { browser } from '$app/environment';
-  import SargaDisplay from './display/SargaDisplay.svelte';
+  import SargaDisplay from './display/ChapterDisplay.svelte';
   import { BiEdit, BiHelpCircle } from 'svelte-icons-pack/bi';
   import { scale, slide } from 'svelte/transition';
   import { TiArrowBackOutline, TiArrowForwardOutline } from 'svelte-icons-pack/ti';
@@ -17,8 +17,7 @@
   import { z } from 'zod';
   import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
   import {
-    kANDa_selected,
-    sarga_selected,
+    chapter_selected,
     editing_status_on,
     BASE_SCRIPT,
     viewing_script,
@@ -34,12 +33,7 @@
   import { BsKeyboard } from 'svelte-icons-pack/bs';
   import User from './user/User.svelte';
   import { get_script_for_lang, get_text_font_class } from '~/tools/font_tools';
-  import {
-    rAmAyaNam_map,
-    get_kANDa_names,
-    get_sarga_names,
-    english_edit_status
-  } from '~/state/main_page/data';
+  import { gita_map, get_chapter_names, english_edit_status } from '~/state/main_page/data';
   import MetaTags from '~/components/tags/MetaTags.svelte';
   import { loadLocalConfig } from './load_local_config';
   import { useSession } from '~/lib/auth-client';
@@ -150,53 +144,28 @@
   // the trans_lang_mut is used to get the translation language
   // this could be removed in future in favour of a simple query
 
-  const get_ramayanam_page_link = (kANDa: number, sarga: number | null = null) => {
-    return `/${kANDa}${!sarga || sarga === 0 ? '' : `/${sarga}`}`;
+  const get_gita_page_link = (chapter: number | null = null) => {
+    return `/${!chapter || chapter === 0 ? '' : `${chapter}`}`;
   };
 
-  let kANDa_names = $state(rAmAyaNam_map.map((kANDa) => kANDa.name_devanagari));
+  let chapter_names = $state(gita_map.map((info) => info.name_devanagari));
   $effect(() => {
-    get_kANDa_names($viewing_script).then((names) => (kANDa_names = names));
-  });
-  let sarga_names = $state(
-    $kANDa_selected !== 0
-      ? rAmAyaNam_map[$kANDa_selected - 1].sarga_data.map((sarga) => sarga.name_devanagari)
-      : []
-  );
-  $effect(() => {
-    get_sarga_names($kANDa_selected, $viewing_script).then((names) => (sarga_names = names));
+    get_chapter_names($viewing_script).then((names) => (chapter_names = names));
   });
 
   $effect(() => {
     if (!browser) return;
     // only sarga_selected should be subscribed
-    const _kANDa_selected = untrack(() => $kANDa_selected);
-    $sarga_selected;
-    if (_kANDa_selected === 0) return;
-    if ($sarga_selected === 0) {
-      goto(get_ramayanam_page_link(_kANDa_selected));
+    $chapter_selected;
+    if ($chapter_selected === 0) {
+      goto('/');
       return;
     }
     if (browser && untrack(() => mounted)) {
-      // console.log([_kANDa_selected, $sarga_selected]);
-      goto(get_ramayanam_page_link(_kANDa_selected, $sarga_selected));
+      goto(get_gita_page_link($chapter_selected));
     }
   });
-  $effect(() => {
-    // only kANDa_selected should be subscribed
-    const _mounted = untrack(() => mounted);
-    $kANDa_selected; // seems this needs to be here for $kANDa_selected to be tracked
-    if (!browser || !_mounted) return;
-    $sarga_selected = 0;
-    const _sarga_selected = untrack(() => $sarga_selected);
-    if ($kANDa_selected !== 0 && _sarga_selected === 0) {
-      // console.log('kanda page', [$kANDa_selected, _sarga_selected]);
-      goto(get_ramayanam_page_link($kANDa_selected));
-    } else if (_mounted && $kANDa_selected == 0 && _sarga_selected == 0) {
-      // console.log('home');
-      goto('/');
-    }
-  });
+
   // Language Typing for Schwa Deletion
   let sanskrit_mode_texts = $derived(
     createQuery({
@@ -223,21 +192,14 @@
   });
 
   const get_page_info = () => {
-    let title = 'श्रीमद्रामायणम्';
-    let description = 'श्रीमद्रामायणस्य पठनम्';
-    if ($kANDa_selected !== 0 && $sarga_selected !== 0) {
-      const kANDa = rAmAyaNam_map[$kANDa_selected - 1];
-      const sarga = kANDa.sarga_data[$sarga_selected - 1];
-      title = `${sarga.name_devanagari} - ${kANDa.name_devanagari} (${sarga.index}-${kANDa.index}) | श्रीमद्रामायणम्`;
+    let title = 'श्रीमद्भगवद्गीता';
+    let description = 'श्रीमद्भगवद्गीतायाः पठनम्';
+    if ($chapter_selected !== 0) {
+      const chapter = gita_map[$chapter_selected - 1];
+      title = `${chapter.name_devanagari} (${chapter.index}) | श्रीमद्रामायणम्`;
       description =
-        `श्रीमद्रामायणस्य ${sarga.name_devanagari} - ${kANDa.name_devanagari} पठनम् | ` +
-        `Read ${sarga.name_normal} - ${kANDa.name_normal} of Shri Ramayanam. ${sarga.index} - ${kANDa.index}`;
-    } else if ($kANDa_selected !== 0 && $sarga_selected === 0) {
-      const kANDa = rAmAyaNam_map[$kANDa_selected - 1];
-      title = `${kANDa.name_devanagari} (${kANDa.index}) | श्रीमद्रामायणम्`;
-      description =
-        `श्रीमद्रामायणस्य ${kANDa.name_devanagari} पठनम् | ` +
-        `Read ${kANDa.name_normal} of Shri Ramayanam. ${kANDa.index}`;
+        `श्रीमद्रामायणस्य ${chapter.name_devanagari} पठनम् | ` +
+        `Read ${chapter.name_normal} of Shri Ramayanam. ${chapter.index}`;
     }
     return {
       title,
@@ -246,8 +208,7 @@
   };
   let PAGE_INFO = $state(get_page_info());
   $effect(() => {
-    $kANDa_selected;
-    $sarga_selected;
+    $chapter_selected;
     PAGE_INFO = get_page_info();
   });
 </script>
@@ -272,15 +233,16 @@
       <User />
     </div>
   </div>
-  <div>
-    <label class="space-x-2 sm:space-x-3">
-      <span class="text-sm font-bold sm:text-base">Select kANDa</span>
+  <div class="space-x-6 sm:space-x-8">
+    <!-- svelte-ignore a11y_label_has_associated_control -->
+    <label class="inline-block space-x-2 sm:space-x-4">
+      <span class="text-sm font-bold sm:text-base">Select Chapter</span>
       <Select
-        class={`${get_text_font_class($viewing_script)} select h-10 w-44 px-2 py-1 sm:h-12 sm:w-52`}
+        class={`select h-10 w-44 px-2 py-1 sm:h-12 sm:w-52`}
         zodType={z.coerce.number().int()}
-        bind:value={$kANDa_selected}
+        bind:value={$chapter_selected}
         options={[{ value: 0, text: 'Select' }].concat(
-          kANDa_names.map((name, index) => ({
+          chapter_names.map((name, index) => ({
             value: index + 1,
             text: `${index + 1} ${name}`
           }))
@@ -288,38 +250,17 @@
         disabled={$editing_status_on}
       />
     </label>
+    {#if $chapter_selected !== 0}
+      {#await import('./display/ChapterUtility.svelte') then SargaUtility}
+        <SargaUtility.default />
+      {/await}
+    {/if}
   </div>
-  {#if $kANDa_selected !== 0}
-    <div class="space-x-6 sm:space-x-8">
-      <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label class="inline-block space-x-2 sm:space-x-4">
-        <span class="text-sm font-bold sm:text-base">Select Sarga</span>
-        <Select
-          class={`select h-10 w-44 px-2 py-1 sm:h-12 sm:w-52`}
-          zodType={z.coerce.number().int()}
-          bind:value={$sarga_selected}
-          options={[{ value: 0, text: 'Select' }].concat(
-            sarga_names.map((name, index) => ({
-              value: index + 1,
-              text: `${index + 1} ${name}`
-            }))
-          )}
-          disabled={$editing_status_on}
-        />
-      </label>
-      {#if $kANDa_selected !== 0 && $sarga_selected !== 0}
-        {#await import('./display/SargaUtility.svelte') then SargaUtility}
-          <SargaUtility.default />
-        {/await}
-      {/if}
-    </div>
-  {/if}
-  {#if $kANDa_selected !== 0 && $sarga_selected !== 0}
-    {@const kANDa = rAmAyaNam_map[$kANDa_selected - 1]}
+  {#if $chapter_selected !== 0}
     <div class="space-x-1 sm:space-x-3">
-      {#if $sarga_selected !== 1}
+      {#if $chapter_selected !== 1}
         <button
-          onclick={() => ($sarga_selected -= 1)}
+          onclick={() => ($chapter_selected -= 1)}
           in:scale
           out:slide
           disabled={$editing_status_on}
@@ -329,9 +270,9 @@
           Previous
         </button>
       {/if}
-      {#if $sarga_selected !== kANDa.sarga_data.length}
+      {#if $chapter_selected !== gita_map.length}
         <button
-          onclick={() => ($sarga_selected += 1)}
+          onclick={() => ($chapter_selected += 1)}
           in:scale
           out:slide
           disabled={$editing_status_on}

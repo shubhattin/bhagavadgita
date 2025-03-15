@@ -2,15 +2,14 @@
   import { client } from '~/api/client';
   import {
     editing_status_on,
-    kANDa_selected,
-    sarga_selected,
+    chapter_selected,
     trans_lang,
     added_translations_indexes,
     TEXT_MODEL_LIST
   } from '~/state/main_page/main_state';
   import {
     QUERY_KEYS,
-    rAmAyaNam_map,
+    gita_map,
     sarga_data,
     trans_en_data,
     trans_lang_data,
@@ -30,9 +29,8 @@
 
   const query_client = useQueryClient();
 
-  let kANDa_info = $derived(rAmAyaNam_map[$kANDa_selected - 1]);
-  let sarga_info = $derived(kANDa_info.sarga_data[$sarga_selected - 1]);
-  let shloka_count = $derived(sarga_info.shloka_count_extracted);
+  let chapter_info = $derived(gita_map[$chapter_selected - 1]);
+  let shloka_total = $derived(chapter_info.total);
 
   let show_time_status = $state(false);
 
@@ -48,14 +46,14 @@
     }
   });
 
-  let selected_model: keyof typeof TEXT_MODEL_LIST = $state('gpt-4o');
+  let selected_model: keyof typeof TEXT_MODEL_LIST = $state('o3-mini');
 
   const translate_sarga_mut = createMutation({
     mutationFn: async (
-      input: Parameters<typeof client.ai.trigger_funcs.translate_sarga.mutate>[0]
+      input: Parameters<typeof client.ai.trigger_funcs.translate_chapter.mutate>[0]
     ) => {
       show_time_status = false;
-      const { run_id, output_type } = await client.ai.trigger_funcs.translate_sarga.mutate(input);
+      const { run_id, output_type } = await client.ai.trigger_funcs.translate_chapter.mutate(input);
 
       return await get_result_from_trigger_run_id<typeof output_type>(run_id!);
     },
@@ -66,43 +64,33 @@
 
       const new_data = new Map($trans_lang !== 0 ? $trans_lang_data.data : $trans_en_data.data);
       translations.forEach((translation) => {
-        if (new_data.has(translation.shloka_num)) return;
-        new_data.set(translation.shloka_num, translation.text);
-        $added_translations_indexes.push(translation.shloka_num);
+        if (new_data.has(translation.index)) return;
+        new_data.set(translation.index, translation.text);
+        $added_translations_indexes.push(translation.index);
       });
       $added_translations_indexes = $added_translations_indexes;
       if ($trans_lang !== 0) await query_client.setQueryData($trans_lang_data_query_key, new_data);
       else
-        await query_client.setQueryData(
-          QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $sarga_selected),
-          new_data
-        );
+        await query_client.setQueryData(QUERY_KEYS.trans_lang_data(1, $chapter_selected), new_data);
       show_time_status = true;
     }
   });
 
   async function translate_sarga_func() {
     // Sanskrit Shlokas + Transliteration + English Translation
-    const texts = await Promise.all(
-      $sarga_data.data!.map(async (shloka_lines, i) => {
-        // # Currently not adding transliteration as context as it seems to work fine without that as well.
-
-        // const normal_shloka = await lipi_parivartak(
-        //   $sarga_data.data![i],
-        //   BASE_SCRIPT,
-        //   'Normal'
-        // );
-        const trans_index = $sarga_data.data!.length - 1 === i ? -1 : i;
-        let txt = `${shloka_lines}`;
-        // let txt = `${shloka_lines}\n${normal_shloka}`;
-        if ($trans_lang !== 0) {
-          const lang_data = $trans_en_data.data;
-          if (lang_data && lang_data.has(trans_index)) txt += `\n\n${lang_data.get(trans_index)}`;
-        }
-        return txt;
-      })
-    );
-    const text = texts.join('\n\n\n');
+    const texts_obj_list = $sarga_data.data!.map((shloka_line, i) => {
+      let text = shloka_line.text;
+      let trans: string | null = null;
+      if ($trans_lang !== 0) {
+        const lang_data = $trans_en_data.data;
+        if (lang_data && lang_data.has(i)) trans = lang_data.get(i)!;
+      }
+      return {
+        text: text,
+        index: shloka_line.index,
+        ...(trans !== null && { translation: trans })
+      };
+    });
     await $translate_sarga_mut.mutateAsync({
       lang_id: $trans_lang,
       model: selected_model,
@@ -114,12 +102,10 @@
               ? trans_prompts.prompts[0].content
               : trans_prompts.prompts_english[0].content,
             {
-              text,
+              text: JSON.stringify(texts_obj_list, null, 2),
               lang: $trans_lang !== 0 ? LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)] : 'English',
-              sarga_name: sarga_info.name_normal,
-              sarga_num: sarga_info.index,
-              kANDa_name: kANDa_info.name_normal,
-              kANDa_num: kANDa_info.index
+              chapter_name: chapter_info.name_normal,
+              chapter_num: chapter_info.index
             }
           )
         }
@@ -129,11 +115,11 @@
 
   let other_lang_allow_translate = $derived(
     $trans_lang !== 0 &&
-      ($trans_lang_data.data?.size ?? 0) < shloka_count + 2 && // atleast 1 untranslated shlokas should be there
-      ($trans_en_data.data?.size ?? 0) >= shloka_count * 0.7 // atleast 70% of the translations should be there
+      ($trans_lang_data.data?.size ?? 0) < shloka_total && // atleast 1 untranslated shlokas should be there
+      ($trans_en_data.data?.size ?? 0) >= shloka_total * 0.7 // atleast 70% of the translations should be there
   );
   let english_allow_translate = $derived(
-    $trans_lang === 0 && ($trans_en_data.data?.size ?? 0) !== shloka_count + 2
+    $trans_lang === 0 && ($trans_en_data.data?.size ?? 0) !== shloka_total
     // all english translations should not be there, anyway we wont be sending it as context to the API anyway
   );
 </script>
@@ -143,7 +129,7 @@
     popup_state={false}
     close_on_confirm={true}
     confirm_func={translate_sarga_func}
-    title={'Are You Sure to translate the sarga ?'}
+    title={'Are You Sure to translate the Chapter ?'}
     body_text={() => {
       return `This will translate the untranslated shlokas to ${$trans_lang !== 0 ? LANG_LIST[LANG_LIST_IDS.indexOf($trans_lang)] : 'English'} which you can edit and then save.`;
     }}
@@ -154,7 +140,7 @@
       class="btn-hover ml-3 inline-block rounded-lg bg-surface-600 px-2 py-1 text-white dark:bg-surface-600"
     >
       <Icon src={AIIcon} class="-mt-1 mr-1 text-2xl" />
-      Translate Sarga with AI
+      Translate Chapter with AI
     </button>
   </ConfirmModal>
   <select

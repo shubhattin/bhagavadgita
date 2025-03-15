@@ -3,16 +3,16 @@ import { generateObject } from 'ai';
 import { z } from 'zod';
 import { createOpenAI } from '@ai-sdk/openai';
 import { createAnthropic } from '@ai-sdk/anthropic';
-import { sarga_translate_schema, translation_out_schema } from '~/api/routers/ai/ai_types';
+import { chapter_translate_schema, translation_out_schema } from '~/api/routers/ai/ai_types';
 
 const openai_text_model = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const anthropic_text_model = createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export const translate_sarga = task({
-  id: 'ai_translate_sarga',
-  maxDuration: 12 * 60, // 12 minutes
-  run: async (payload: z.infer<typeof sarga_translate_schema.input>) => {
-    payload = sarga_translate_schema.input.parse(payload);
+  id: 'gita_ai_translate_chapter',
+  maxDuration: 15 * 60, // 12 minutes
+  run: async (payload: z.infer<typeof chapter_translate_schema.input>) => {
+    payload = chapter_translate_schema.input.parse(payload);
     const { messages, model } = payload;
 
     try {

@@ -1,9 +1,8 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { sarga_data, rAmAyaNam_map } from '~/state/main_page/data';
+  import { sarga_data, gita_map } from '~/state/main_page/data';
   import {
-    sarga_selected,
-    kANDa_selected,
+    chapter_selected,
     BASE_SCRIPT,
     image_tool_opened,
     viewing_script,
@@ -37,12 +36,12 @@
   let excel_preview_opened = $state(false);
 
   const download_excel_file = createMutation({
-    mutationKey: ['sarga', 'download_excel_data'],
+    mutationKey: ['chapter', 'download_excel_data'],
     mutationFn: async () => {
       if (!browser) return;
       // the method used below creates a url for both dev and prod
       const ExcelJS = (await import('exceljs')).default;
-      const url = new URL('/data/ramayan/template/excel_file_template.xlsx', import.meta.url).href;
+      const url = new URL('/data/gita/template/excel_file_template.xlsx', import.meta.url).href;
       const req = await fetch(url);
       const file_blob = await req.blob();
       const workbook = new ExcelJS.Workbook();
@@ -51,14 +50,12 @@
       const COLUMN_FOR_DEV = 2;
       const TEXT_START_ROW = 2;
       const translation_texts =
-        await client.translations.get_all_langs_translations_per_sarga.query({
-          kANDa_num: $kANDa_selected,
-          sarga_num: $sarga_selected
+        await client.translations.get_all_langs_translations_per_chapter.query({
+          chapter_num: $chapter_selected
         });
-      const shloka_count =
-        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].shloka_count_extracted;
+      const shloka_count = gita_map[$chapter_selected - 1].total;
       for (let i = 0; i < $sarga_data.data!.length; i++) {
-        worksheet.getCell(i + COLUMN_FOR_DEV, TEXT_START_ROW).value = $sarga_data.data![i];
+        worksheet.getCell(i + COLUMN_FOR_DEV, TEXT_START_ROW).value = $sarga_data.data![i].text;
         worksheet.getCell(i + COLUMN_FOR_DEV, 1).value = i === shloka_count + 1 ? -1 : i;
       }
       await transliterate_xlxs_file(
@@ -74,49 +71,41 @@
       );
 
       // saving file to output path
-      let sarga_name =
-        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split(
-          '\n'
-        )[0];
+      let sarga_name = gita_map[$chapter_selected - 1].name_normal.split('\n')[0];
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       });
       current_dowbload_link = URL.createObjectURL(blob);
-      current_file_name = `${$kANDa_selected}-${$sarga_selected}. ${sarga_name}.xlsx`;
+      current_file_name = `${$chapter_selected}. ${sarga_name}.xlsx`;
       current_workbook = workbook;
       excel_preview_opened = true;
     }
   });
 
   const download_text_file = createMutation({
-    mutationKey: ['sarga', 'download_text_data'],
+    mutationKey: ['chapter', 'download_text_data'],
     mutationFn: async () => {
       if (!browser) return;
       const text = (
         await Promise.all(
           $sarga_data.data!.map((shloka_lines) =>
-            lipi_parivartak(shloka_lines, BASE_SCRIPT, $viewing_script)
+            lipi_parivartak(shloka_lines.text, BASE_SCRIPT, $viewing_script)
           )
         )
       ).join('\n\n');
       const blob = new Blob([text], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
-      const sarga_name_normal =
-        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_normal.split(
-          '\n'
-        )[0];
+      const sarga_name_normal = gita_map[$chapter_selected - 1].name_normal.split('\n')[0];
       const sarga_name_script = await lipi_parivartak(
-        rAmAyaNam_map[$kANDa_selected - 1].sarga_data[$sarga_selected - 1].name_devanagari.split(
-          '\n'
-        )[0],
+        gita_map[$chapter_selected - 1].name_devanagari.split('\n')[0],
         BASE_SCRIPT,
         $viewing_script
       );
       const is_not_brahmic_script = ['Normal', 'Romanized'].includes($viewing_script);
       download_file_in_browser(
         url,
-        `${$kANDa_selected}-${$sarga_selected} ${sarga_name_script}${is_not_brahmic_script ? '' : ` (${sarga_name_normal})`}.txt`
+        `${$chapter_selected} ${sarga_name_script}${is_not_brahmic_script ? '' : ` (${sarga_name_normal})`}.txt`
       );
     }
   });
@@ -135,7 +124,7 @@
   triggerBase="outline-hidden select-none"
 >
   {#snippet trigger()}
-    <span class="btn-hover m-0" title="Extra Options" transition:fade>
+    <span class="btn-hover" title="Extra Options" transition:fade>
       <Icon class="mx-[0.17rem] text-lg sm:mx-0 sm:text-2xl" src={BsThreeDots} />
     </span>
   {/snippet}

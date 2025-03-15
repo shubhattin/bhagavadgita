@@ -12,14 +12,14 @@ build
 
 src/tools/converter/resources/dattAMsh/
 
-data/ramayan/data
-data/ramayan/raw_data
-data/ramayan/out
-data/ramayan/text_data
-data/ramayan/zipped
-data/ramayan/translations/
-data/ramayan/ramayan_map.json
-data/ramayan/summary/summaries
+data/gita/data
+data/gita/raw_data
+data/gita/out
+data/gita/text_data
+data/gita/zipped
+data/gita/translations/
+data/gita/ramayan_map.json
+data/gita/summary/summaries
 
 src/db/scripts/out/
 src/db/migrations/

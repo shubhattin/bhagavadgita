@@ -3,8 +3,7 @@
   import { TrOutlineHelpSquare } from 'svelte-icons-pack/tr';
   import Icon from '~/tools/Icon.svelte';
   import {
-    sarga_selected,
-    kANDa_selected,
+    chapter_selected,
     trans_lang,
     sanskrit_mode,
     edit_language_typer_status,
@@ -15,7 +14,7 @@
     trans_en_data,
     trans_lang_data,
     english_edit_status,
-    rAmAyaNam_map,
+    gita_map,
     bulk_text_edit_status,
     bulk_text_data,
     trans_lang_data_query_key,
@@ -33,9 +32,8 @@
 
   let { tab_edit_name = $bindable() }: { tab_edit_name: 'main' | 'bulk' } = $props();
 
-  let kANDa_info = $derived(rAmAyaNam_map[$kANDa_selected - 1]);
-  let sarga_info = $derived(kANDa_info.sarga_data[$sarga_selected - 1]);
-  let shloka_count = $derived(sarga_info.shloka_count_extracted);
+  let chapter_info = $derived(gita_map[$chapter_selected - 1]);
+  let shloka_count = $derived(chapter_info.total);
 
   let trans_text_font_info = $derived(
     $english_edit_status
@@ -99,24 +97,10 @@
     if (!$english_edit_status) {
       await query_client.setQueryData($trans_lang_data_query_key, trans_data);
     } else {
-      await query_client.setQueryData(
-        QUERY_KEYS.trans_lang_data(1, $kANDa_selected, $sarga_selected),
-        trans_data
-      );
+      await query_client.setQueryData(QUERY_KEYS.trans_lang_data(1, $chapter_selected), trans_data);
     }
     $bulk_text_edit_status = false;
     tab_edit_name = 'main';
-    // modal_store.trigger({
-    //   type: 'confirm',
-    //   title: 'Sure to sync the text to Main Tab ?',
-    //   body:
-    //     'This will write the shloka contents to the main tab text which can then be verified and saved from there.' +
-    //     '\nAlso be sure to verify for any sorts of distortions, it sometimes adds spaces or new lines on its own (nothing too serious). ' +
-    //     'If you are adding to an empty non translated shloka it should be fine.',
-    //   response: (r: boolean) => {
-    //     if (r) on_confirm();
-    //   }
-    // });
   };
 
   const detect_shortcut_pressed = (event: KeyboardEvent) => {
@@ -157,11 +141,11 @@
           <ul class="list-option rounded-lg">
             <li>
               If shlokas have missing index markers then they will be interpreted in the usual
-              order, i.e. 0, 1, 2 to last and -1.
+              order, i.e. 0, 1, 2 to last.
             </li>
             <li>
               Shlokas have to be strictly in the same order and number. All the way from 0, 1, 2, 3
-              ..... n, -1.
+              ....., n.
             </li>
           </ul>
         </li>
@@ -188,14 +172,14 @@
           'If you are adding to an empty non translated shloka it should be fine.'}
       >
         <button
-          class="btn rounded-lg bg-tertiary-700 px-1 py-1 font-bold text-white dark:bg-tertiary-600"
+          class="btn gap-1 rounded-lg bg-tertiary-700 px-1 py-1 font-bold text-white dark:bg-tertiary-600"
         >
-          <Icon src={OiSync16} class="-my-1 mr-1 text-lg" />
+          <Icon src={OiSync16} class="-my-1 text-lg" />
           Sync to Main
         </button>
       </ConfirmModal>
       <span class="text-xs font-bold">Shlokas Found: {trans_map.size}</span>
-      <span class="text-xs font-semibold">Total Shlokas: {shloka_count + 2}</span>
+      <span class="text-xs font-semibold">Total Shlokas: {shloka_count}</span>
     </div>
   {/if}
 </div>

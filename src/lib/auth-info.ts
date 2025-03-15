@@ -9,7 +9,7 @@ export type user_verfied_info_type = {
 };
 
 export const AUTH_INFO_URL = `${PUBLIC_BETTER_AUTH_URL}/api/ext`;
-export const PROJECT_ID = 1; // as defined in tsc_user database
+export const PROJECT_ID = 2; // as defined in tsc_user database
 
 export const get_user_project_info = async (user_id: string, cookie?: string | null) => {
   const data = await ky

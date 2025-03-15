@@ -17,7 +17,7 @@ import {
 import { copy_plain_object } from '~/tools/kry';
 import { get_image_font_info } from './settings';
 import { client } from '~/api/client';
-import { kANDa_selected, sarga_selected } from '~/state/main_page/main_state';
+import { chapter_selected } from '~/state/main_page/main_state';
 
 export let canvas = writable<fabric.Canvas>();
 export let background_image = writable<fabric.FabricImage>();
@@ -42,41 +42,36 @@ export async function set_background_image_type(shaded_image: boolean) {
 
 export let image_script = writable<script_list_type>();
 export let image_lang = writable<number>(lang_list_obj.English);
-export let image_kANDa = writable<number>(0);
-export let image_sarga = writable<number>(0);
-// ^ kanda and sarga will be inherited from the main during mount
+export let image_chapter = writable<number>(0);
+// ^ chapter will be inherited from the main during mount
 export let image_shloka = writable<number>(1);
 export let image_rendering_state = writable<boolean>(false);
 
 export let zip_download_state = writable<[number, number] | null>(null);
 
-export const image_sarga_data = get_derived_query(
-  [image_kANDa, image_sarga],
-  ([$image_kANDa, $image_sarga]) => {
-    return createQuery(
-      {
-        queryKey: QUERY_KEYS.sarga_data($image_kANDa, $image_sarga),
-        enabled: browser && $image_kANDa !== 0 && $image_sarga !== 0,
-        placeholderData: [],
-        queryFn: async () => {
-          return await client.translations.get_sarga_data.query({
-            kANDa_num: get(kANDa_selected),
-            sarga_num: get(sarga_selected)
-          });
-        }
-      },
-      queryClient
-    );
-  }
-);
+export const image_sarga_data = get_derived_query([image_chapter], ([$image_chapter]) => {
+  return createQuery(
+    {
+      queryKey: QUERY_KEYS.sarga_data($image_chapter),
+      enabled: browser && $image_chapter !== 0,
+      placeholderData: [],
+      queryFn: async () => {
+        return await client.translations.get_chapter_data.query({
+          chapter_num: $image_chapter
+        });
+      }
+    },
+    queryClient
+  );
+});
 export const image_trans_data = get_derived_query(
-  [image_kANDa, image_sarga, image_lang],
-  ([$image_kANDa, $image_sarga, $image_lang]) => {
+  [image_chapter, image_lang],
+  ([$image_chapter, $image_lang]) => {
     return createQuery(
       {
-        queryKey: QUERY_KEYS.trans_lang_data($image_lang, $image_kANDa, $image_sarga),
-        enabled: browser && $image_kANDa !== 0 && $image_sarga !== 0,
-        queryFn: () => get_translations($image_kANDa, $image_sarga, $image_lang)
+        queryKey: QUERY_KEYS.trans_lang_data($image_lang, $image_chapter),
+        enabled: browser && $image_chapter !== 0,
+        queryFn: () => get_translations($image_chapter, $image_lang)
       },
       queryClient
     );
