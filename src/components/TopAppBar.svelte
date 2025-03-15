@@ -117,7 +117,7 @@
           <span>The Sanskrit Channel</span>
         </a>
         <a
-          href="https://github.com/shubhattin/valmiki_ramayanam"
+          href="https://github.com/shubhattin/bhagvadgita"
           target="_blank"
           rel="noopener noreferrer"
           class="group flex space-x-1 rounded-md px-2 py-1 text-sm hover:bg-gray-200 sm:text-base dark:hover:bg-gray-700"
