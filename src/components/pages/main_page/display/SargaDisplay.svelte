@@ -89,7 +89,7 @@
           BASE_SCRIPT,
           'Normal'
         );
-        const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i;
+        const trans_index = i;
         let txt = `${shloka_lines}\n${normal_shloka}`;
         const lang_data = $trans_lang === 0 ? $trans_en_data.data : $trans_lang_data.data;
         if (lang_data && lang_data.has(trans_index)) txt += `\n\n${lang_data.get(trans_index)}`;
@@ -248,7 +248,7 @@
       <div transition:fade={{ duration: 250 }} class="space-y-[0.15rem]">
         {#each transliterated_sarga_data as shloka_lines, i (i)}
           <!-- with 0 and -1 index -->
-          {@const trans_index = transliterated_sarga_data.length - 1 === i ? -1 : i}
+          {@const trans_index = i}
           <div class="rounded-lg px-2 py-0.5 hover:bg-gray-200 dark:hover:bg-gray-800">
             <div class="flex space-x-2">
               {#if $sarga_data.data![i].shloka_num || (i > 2 && i < transliterated_sarga_data.length - 2)}

@@ -47,7 +47,7 @@
 
   $effect(() => {
     if ($chapter_selected) {
-      $shloka_index = 1;
+      $shloka_index = 4;
     }
   });
   let shloka_index = writable(1);
