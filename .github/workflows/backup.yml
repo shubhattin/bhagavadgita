@@ -36,25 +36,3 @@ jobs:
           name: db_backup
           path: src/db/scripts/backup/
           retention-days: 60
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-        # set working directory to data/gita
-        # Install dependencies
-      - name: Install dependencies
-        working-directory: data/gita
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Generate Excel Files
-        working-directory: data/gita
-        run: |
-          python3 get_json.py --no-run-test
-      - run: |
-          npx vite-node data/gita/make_excel_files.ts --no-zip
-      - uses: actions/upload-artifact@v4
-        with:
-          name: excel_files
-          path: data/gita/out/
-          retention-days: 60
