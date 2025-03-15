@@ -63,7 +63,7 @@
       format: 'png',
       multiplier: 1 / $scaling_factor
     });
-    const name = `Chapter ${$image_chapter} Shloka No. ${shloka_num ?? $image_shloka}${remove_background ? '' : ' (with background)'}.png`;
+    const name = `Chapter ${$image_chapter} Index No. ${shloka_num ?? $image_shloka}${remove_background ? '' : ' (with background)'}.png`;
     if (download) download_file_in_browser(url, name);
     if (remove_background) await add_background_image();
     else if ($shaded_background_image_status && restore)
@@ -88,7 +88,7 @@
       }
     });
     const blob = new Blob([svg_text], { type: 'image/svg+xml' });
-    const name = `Chapter ${$image_chapter} Shloka No. ${shloka_num ?? $image_shloka}.svg`;
+    const name = `Chapter ${$image_chapter} Index No. ${shloka_num ?? $image_shloka}.svg`;
     if (download) {
       const svg_url = URL.createObjectURL(blob);
       download_file_in_browser(svg_url, name);
