@@ -110,9 +110,9 @@
     </div>
     <div>
       <span class="font-semibold">Additions ➔ {added_indexes.length}</span>
-      {#if added_indexes.length > 0}
+      <!-- {#if added_indexes.length > 0}
         <span>{`{ ${added_indexes.join(', ')} }`}</span>
-      {/if}
+      {/if} -->
     </div>
   {/snippet}
 </ConfirmModal>
@@ -145,9 +145,9 @@
     </div>
     <div>
       <span class="font-semibold">Additions ➔ {added_indexes.length}</span>
-      {#if added_indexes.length > 0}
+      <!-- {#if added_indexes.length > 0}
         <span>{`{ ${added_indexes.join(', ')} }`}</span>
-      {/if}
+      {/if} -->
     </div>
   {/snippet}
 </ConfirmModal>

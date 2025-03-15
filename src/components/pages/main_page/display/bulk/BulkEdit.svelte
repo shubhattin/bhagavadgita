@@ -33,7 +33,7 @@
   let { tab_edit_name = $bindable() }: { tab_edit_name: 'main' | 'bulk' } = $props();
 
   let chapter_info = $derived(gita_map[$chapter_selected - 1]);
-  let shloka_count = $derived(chapter_info.shloka_count);
+  let shloka_count = $derived(chapter_info.total);
 
   let trans_text_font_info = $derived(
     $english_edit_status
@@ -141,11 +141,11 @@
           <ul class="list-option rounded-lg">
             <li>
               If shlokas have missing index markers then they will be interpreted in the usual
-              order, i.e. 0, 1, 2 to last and -1.
+              order, i.e. 0, 1, 2 to last.
             </li>
             <li>
               Shlokas have to be strictly in the same order and number. All the way from 0, 1, 2, 3
-              ..... n, -1.
+              ....., n.
             </li>
           </ul>
         </li>
@@ -172,14 +172,14 @@
           'If you are adding to an empty non translated shloka it should be fine.'}
       >
         <button
-          class="btn rounded-lg bg-tertiary-700 px-1 py-1 font-bold text-white dark:bg-tertiary-600"
+          class="btn gap-1 rounded-lg bg-tertiary-700 px-1 py-1 font-bold text-white dark:bg-tertiary-600"
         >
-          <Icon src={OiSync16} class="-my-1 mr-1 text-lg" />
+          <Icon src={OiSync16} class="-my-1 text-lg" />
           Sync to Main
         </button>
       </ConfirmModal>
       <span class="text-xs font-bold">Shlokas Found: {trans_map.size}</span>
-      <span class="text-xs font-semibold">Total Shlokas: {shloka_count + 2}</span>
+      <span class="text-xs font-semibold">Total Shlokas: {shloka_count}</span>
     </div>
   {/if}
 </div>
