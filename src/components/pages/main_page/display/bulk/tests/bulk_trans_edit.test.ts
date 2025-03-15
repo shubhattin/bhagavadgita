@@ -72,7 +72,7 @@ Contents of Shloka 16
 17. ${NON_EXIST_INDICATOR}
 
 
--1. Shloka Ends`;
+18. Shloka Ends`;
 
 const map = new Map<number, string>();
 map.set(0, 'Shloka Starts');
@@ -93,7 +93,7 @@ map.set(14, 'Shloka 14\nContents of Shloka 14');
 map.set(15, 'Shloka 15\nContents of Shloka 15');
 map.set(16, 'Shloka 16\nContents of Shloka 16');
 // map.set(17, 'Missing');
-map.set(-1, 'Shloka Ends');
+map.set(18, 'Shloka Ends');
 
 const text1 = `0. Shloka Starts
 
@@ -166,14 +166,14 @@ Contents of Shloka 16
 17. ----
 
 
--1. Shloka Ends`;
+18. Shloka Ends`;
 
 describe('Testing Bulk Edit Translations', () => {
   it('Translation Map to Text', async () => {
-    expect(trans_map_to_text(map, 17)).toBe(text);
+    expect(trans_map_to_text(map, 18)).toBe(text);
   });
   it('Text to Translation Map', async () => {
-    const out_map = text_to_trans_map(text1, 17);
+    const out_map = text_to_trans_map(text1, 18);
     map.forEach((value, i) => expect(value).toBe(out_map.get(i)));
   });
 });

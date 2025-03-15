@@ -8,7 +8,7 @@ export function trans_map_to_text(trans_map: Map<number, string>, shloka_count: 
     if (trans_map.has(i)) texts_per_shloka.push(shloka_template_func(trans_map.get(i)!, i));
     else texts_per_shloka.push(shloka_template_func(NON_EXIST_INDICATOR, i));
   };
-  for (let i = 0; i < shloka_count; i++) check_func(i);
+  for (let i = 0; i <= shloka_count; i++) check_func(i);
   return texts_per_shloka.join('\n\n\n');
 }
 
@@ -34,7 +34,7 @@ export function text_to_trans_map(text: string, shloka_count: number) {
     const shloka_text = /(?<=^-?\d+(\.|:) ).+/gms.exec(shloka)?.[0].trim();
     if (shloka_text) {
       const shloka_num = parseInt(/^-?\d+(?=\.|: )/gm.exec(shloka)?.[0]!); // shloka number extractions
-      if (shloka_num >= -1 && shloka_num <= shloka_count && !/^---+$/g.test(shloka_text))
+      if (shloka_num >= 0 && shloka_num <= shloka_count && !/^---+$/g.test(shloka_text))
         // ignore if line starts with --- or more dashes
         trans_map.set(shloka_num, shloka_text);
     } else if (i == 0) {
@@ -50,9 +50,6 @@ export function text_to_trans_map(text: string, shloka_count: number) {
       // we will check for what index to set for last shloka
       const shloka = texts[i].trim();
       trans_map.set(i, shloka);
-    }
-    if (i > shloka_count && i < texts.length) {
-      trans_map.set(-1, texts[i].trim());
     }
   }
   return trans_map;
